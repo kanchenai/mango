@@ -1,0 +1,101 @@
+.bg{
+    background: #141516;
+    width: 1280px;
+    height: 720px;
+}
+
+.navigation{
+    height: 33px;
+    width: 780px;
+    left: 150px;
+    top:28px;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.navigation .item,
+.navigation .focus{
+    width: 60px;
+    height: 33px;
+}
+
+.navigation .focus{
+    background: #606060;
+    border-radius: 7px;
+}
+
+.navigation .item .txt{
+    width: 60px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+    top: 5px;
+    color: #dfeaf4;
+    text-align: center;
+}
+
+.navigation .item_focus .txt{
+    width: 60px;
+    height: 23px;
+    font-size: 23px;
+    line-height: 23px;
+    top: 0px;
+    color: white;
+    text-align: center;
+}
+
+.navigation .select{
+    width: 10px;
+    height: 2px;
+    background: white;
+    top: 31px;
+    left: 25px;
+}
+
+.navigation .item_focus .select,
+.navigation .item .select{
+    display: none;
+}
+
+
+.navigation .item_select .select{
+    display: block;
+}
+
+.carousel,
+.carousel .big_picture,
+.carousel .big_picture img{
+    width: 1280px;
+    height: 490px;
+    overflow: hidden;
+}
+
+.point_list{
+    width: 80px;
+    height: 8px;
+    left: 1150px;
+    top: 466px;
+}
+
+.point_list .item{
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: white;
+}
+
+.point_list .item_focus{
+    background: #ee682a;
+}
+
+.title{
+    width: 1000px;
+    height: 31px;
+    left: 25px;
+}
+
+.title .txt{
+    height: 31px;
+    white-space: nowrap;
+    line-height: 31px;
+}
