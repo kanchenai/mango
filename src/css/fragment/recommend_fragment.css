@@ -1,0 +1,157 @@
+.carousel,
+.carousel .big_picture,
+.carousel .big_picture img{
+    width: 1280px;
+    height: 490px;
+    overflow: hidden;
+}
+
+.carousel .big_picture img{
+    border-radius: 0px;
+}
+
+.point_list{
+    width: 80px;
+    height: 8px;
+    left: 1150px;
+    top: 466px;
+    overflow: hidden;
+}
+
+.point_list .item{
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: white;
+}
+
+.point_list .item_focus{
+    background: #ee682a;
+}
+
+.title{
+    width: 1000px;
+    height: 31px;
+    left: 25px;
+}
+
+.title .icon img{
+    width: 31px;
+    height: 31px;
+}
+
+.title .txt{
+    height: 31px;
+    white-space: nowrap;
+    line-height: 31px;
+    font-size: 20px;
+}
+
+.focus{
+    border:white 3px solid;
+}
+
+.pic{
+    left: 3px;
+    top: 3px;
+}
+
+.pic img{
+    border-radius: 0px;
+}
+
+.txt{
+    width: 288px;
+    height: 14px;
+    left: 3px;
+    line-height: 14px;
+    font-size: 13px;
+    color: white;
+}
+
+.info{
+    width: 288px;
+    height: 12px;
+    left: 3px;
+    line-height: 12px;
+    font-size: 12px;
+    color: #656566;
+}
+
+.history{
+    width: 1238px;
+    height: 215px;
+    left: 22px;
+    top: 547px;
+    overflow: hidden;
+}
+
+.history .item{
+    width: 294px;
+    height: 208px;
+}
+
+.history .focus,
+.history .pic img{
+    width: 288px;
+    height: 162px;
+    border-radius: 0px;
+}
+
+.history .txt{
+    top: 175px;
+}
+
+.history .info{
+    top: 196px;
+}
+
+.season_hot{
+    width: 1280px;
+    height: 490px;
+    top: 786px;
+}
+
+.season_hot .item{
+    width: 306px;
+    height: 176px;
+}
+
+.season_hot .focus,
+.season_hot .pic img{
+    width: 300px;
+    height: 170px;
+}
+
+.season_hot .item .txt{
+    top: 182px;
+}
+
+.season_hot .item .info{
+    top: 203px;
+}
+
+.ace_program{
+    width: 1280px;
+    height: 420px;
+    top: 1304px;
+}
+
+.ace_program .item{
+    width: 242px;
+    height: 335px;
+}
+
+.ace_program .focus,
+.ace_program .pic img{
+    width: 236px;
+    height: 329px;
+}
+
+.ace_program .item .txt{
+    top: 341px;
+}
+
+.ace_program .item .info{
+    top: 362px;
+}

@@ -15,7 +15,7 @@ export default class Application extends GroupView {
          * view-app的版本号
          * @type {string}
          */
-        this.viewVersion = "0.2.0(2022-07-06)";
+        this.viewVersion = "0.2.0(2022-07-11)";
         this.focusable = false;
         this.id = id;
         delete this.viewManager;

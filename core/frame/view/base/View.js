@@ -44,16 +44,16 @@ export default class View {
         this.onVisibleChangeListener = "";
     }
 
-    addChild(view){
-        if(!view instanceof View){
+    addChild(view) {
+        if (!view instanceof View) {
             return;
         }
-        if(view.fatherView){
+        if (view.fatherView) {
             view.fatherView.removeChild(view);
         }
         view.fatherView = this;
-        if(view.id){
-            this.viewMap.set(view.id,view);
+        if (view.id) {
+            this.viewMap.set(view.id, view);
         }
         this.childViews.push(view);
     }
@@ -64,18 +64,18 @@ export default class View {
      */
     removeChild(view) {
         this.childViews.removeEle(view);
-        if(view.id){
-            this.viewMap.set(view.id,undefined);
+        if (view.id) {
+            this.viewMap.set(view.id, undefined);
         }
     }
 
     findViewById(id) {
         var view = this.viewMap.get(id);
-        if(!view){//不存在
-            for(var i=0;i<this.childViews.length;i++){
+        if (!view) {//不存在
+            for (var i = 0; i < this.childViews.length; i++) {
                 var child = this.childViews[i];
                 view = child.findViewById(id);
-                if(view){
+                if (view) {
                     break;
                 }
             }
@@ -207,7 +207,7 @@ export default class View {
         this.ele.innerHTML = html;
     }
 
-    get html(){
+    get html() {
         return this.ele.innerHTML;
     }
 
@@ -315,6 +315,11 @@ export default class View {
         var id = View.parseAttribute("view-id", this.ele);
         if (id) {
             this.id = id;
+        } else {
+            if (this.ele.hasAttribute("id")) {
+                console.warn("id的属性名是错误,请查看ele:");
+                console.warn("\t\t",this.ele);
+            }
         }
 
         var visible = View.parseAttribute("view-visible", this.ele);//滚动
@@ -335,10 +340,10 @@ export default class View {
         return value;
     }
 
-    static getViewType(ele){
+    static getViewType(ele) {
         var viewType = ele.tagName;
         if (viewType == "DIV") {
-            viewType = View.parseAttribute("view-type",ele);
+            viewType = View.parseAttribute("view-type", ele);
             if (viewType) {
                 viewType = viewType.toUpperCase();
             }
@@ -530,7 +535,7 @@ export default class View {
         }
 
         var viewType = View.getViewType(ele);
-        if(viewType == "VIEW" || viewType == "VIEW_ITEM"){
+        if (viewType == "VIEW" || viewType == "VIEW_ITEM") {
             return size;
         }
 
@@ -608,16 +613,16 @@ export default class View {
      * @param{Element} ele
      * @returns {Element}
      */
-    static findEleBy(id,ele){
+    static findEleBy(id, ele) {
         var viewId = ele.getAttribute("view-id");
-        if(viewId == id){
+        if (viewId == id) {
             return ele
         }
 
         var ele_list = ele.children;
         for (var child_ele of ele_list) {
-            var foundEle = View.findEleBy(id,child_ele);
-            if(foundEle){
+            var foundEle = View.findEleBy(id, child_ele);
+            if (foundEle) {
                 return foundEle;
             }
         }

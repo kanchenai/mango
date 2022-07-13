@@ -1,3 +1,5 @@
+
+
 /**
  * 判断一个变量是否为空，
  * 0不算空
@@ -11,7 +13,6 @@ var isEmpty = function (data) {
     return false;
 }
 
-
 export default {
-    isEmpty
+    isEmpty,
 }

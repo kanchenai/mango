@@ -126,7 +126,7 @@ export default class ViewManager {
             }
             var page = this.page;
             //获取对应的控件
-            var nextView = page.viewManager.getView(_next);
+            var nextView = page.findViewById(_next);
             if (nextView) {//不是控件或绑定的是方法
                 _next = nextView;
             } else {

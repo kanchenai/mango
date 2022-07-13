@@ -62,40 +62,8 @@
     display: block;
 }
 
-.carousel,
-.carousel .big_picture,
-.carousel .big_picture img{
+.frame{
     width: 1280px;
-    height: 490px;
+    height: 720px;
     overflow: hidden;
-}
-
-.point_list{
-    width: 80px;
-    height: 8px;
-    left: 1150px;
-    top: 466px;
-}
-
-.point_list .item{
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background: white;
-}
-
-.point_list .item_focus{
-    background: #ee682a;
-}
-
-.title{
-    width: 1000px;
-    height: 31px;
-    left: 25px;
-}
-
-.title .txt{
-    height: 31px;
-    white-space: nowrap;
-    line-height: 31px;
 }

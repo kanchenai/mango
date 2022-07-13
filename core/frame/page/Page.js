@@ -188,7 +188,7 @@ export default class Page extends GroupView {
      * 触发焦点变化监听器
      * 去除调用application的callFocusChangeListener调用
      */
-    callFocusChangeListener(view, hasFocus, scrollAimView) {
+    callFocusChangeListener(view, hasFocus, intercept) {
         if (this.onFocusChangeListener && typeof this.onFocusChangeListener == "string") {
             this.onFocusChangeListener = this.page[this.onFocusChangeListener];
         }
@@ -226,7 +226,7 @@ export default class Page extends GroupView {
         super.html = html;
     }
 
-    get html(){
+    get html() {
         return super.html;
     }
 

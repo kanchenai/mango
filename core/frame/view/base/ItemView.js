@@ -105,6 +105,7 @@ export default class ItemView extends View {
      */
     callFocusChangeListener(view, hasFocus) {
         var onFocusChangeListener = null;
+        var intercept = false;
         if (this.onFocusChangeListener) {
             if (typeof this.onFocusChangeListener == "string") {
                 onFocusChangeListener = this.page[this.onFocusChangeListener];
@@ -116,10 +117,11 @@ export default class ItemView extends View {
             }
             this.loadImageResource();//这个方法会向子控件迭代加载图片
             onFocusChangeListener.call(this.page, view, hasFocus);
-        } else {
-            if (this.fatherView) {
-                this.fatherView.callFocusChangeListener(view, hasFocus);
-            }
+            intercept = true;
+        }
+
+        if (this.fatherView) {
+            this.fatherView.callFocusChangeListener(view, hasFocus,intercept);
         }
 
         if (this.fatherView && hasFocus) {//不能instanceof GroupView
