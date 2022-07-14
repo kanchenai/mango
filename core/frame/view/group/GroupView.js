@@ -6,8 +6,8 @@ import ItemView from "@core/frame/view/base/ItemView";
 import ViewUtils from "@core/frame/util/ViewUtils";
 
 export default class GroupView extends ScrollView {
-    constructor(viewManager) {
-        super(viewManager);
+    constructor(viewManager, listenerLocation) {
+        super(viewManager, listenerLocation);
         this.focusable = true;
 
         this._data = [];
@@ -30,6 +30,32 @@ export default class GroupView extends ScrollView {
         this.nextLeft = "";
         //焦点向右的view或方法
         this.nextRight = "";
+    }
+
+    set html(html) {
+        //初始化滚动器
+        this.scroller.init();
+        //将html设置到节点中
+        this.scroller.html = html;
+        //业务层触发的，listenerLocation为this
+        this.listenerLocation = this;
+        //构建控件
+        this.viewManager.buildView(this);
+        //测量滚动器实际大小，并设置
+        this.measure();
+        //绑定ImageView
+        this.bindImage();
+
+        var that = this;
+        setTimeout(function () {
+            if (that.isShowing) {//显示
+                that.loadImageResource();//加载图片
+            }
+        }, 50);
+    }
+
+    get html() {
+        return this.scroller.html;
     }
 
     requestFocus() {
@@ -84,7 +110,7 @@ export default class GroupView extends ScrollView {
         var onVisibleChangeListener = null;
         if (this.onVisibleChangeListener) {
             if (typeof this.onVisibleChangeListener == "string") {
-                onVisibleChangeListener = this.page[this.onVisibleChangeListener];
+                onVisibleChangeListener = this.listenerLocation[this.onVisibleChangeListener];
             } else if (this.onVisibleChangeListener instanceof Function) {
                 onVisibleChangeListener = this.onVisibleChangeListener;
             } else {
@@ -92,7 +118,7 @@ export default class GroupView extends ScrollView {
                 return;
             }
             this.loadImageResource();//这个方法会向子控件迭代加载图片
-            onVisibleChangeListener.call(this.page, view, isShowing);
+            onVisibleChangeListener.call(this.listenerLocation, view, isShowing);
         } else {
             if (this.fatherView) {
                 this.fatherView.callVisibleChangeListener(view, isShowing);
@@ -109,11 +135,11 @@ export default class GroupView extends ScrollView {
      * @param{boolean} hasFocus
      * @param{boolean} intercept 是否拦截（在子控件中已设置监听，不需要触发父控件的）
      */
-    callFocusChangeListener(view, hasFocus,intercept) {
+    callFocusChangeListener(view, hasFocus, intercept) {
         var onFocusChangeListener = null;
         if (this.onFocusChangeListener && !intercept) {
             if (typeof this.onFocusChangeListener == "string") {
-                onFocusChangeListener = this.page[this.onFocusChangeListener];
+                onFocusChangeListener = this.listenerLocation[this.onFocusChangeListener];
             } else if (this.onFocusChangeListener instanceof Function) {
                 onFocusChangeListener = this.onFocusChangeListener;
             } else {
@@ -121,13 +147,12 @@ export default class GroupView extends ScrollView {
                 return;
             }
             this.loadImageResource();//这个方法会向子控件迭代加载图片
-
-            onFocusChangeListener.call(this.page, view, hasFocus);
+            onFocusChangeListener.call(this.listenerLocation, view, hasFocus);
             intercept = true;
         }
 
         if (this.fatherView) {
-            this.fatherView.callFocusChangeListener(view, hasFocus,intercept);
+            this.fatherView.callFocusChangeListener(view, hasFocus, intercept);
         }
 
         if (this.fatherView && hasFocus) {//不能instanceof GroupView
@@ -161,14 +186,14 @@ export default class GroupView extends ScrollView {
         var onClickListener = null;
         if (this.onClickListener) {
             if (typeof this.onClickListener == "string") {
-                onClickListener = this.page[this.onClickListener];
+                onClickListener = this.listenerLocation[this.onClickListener];
             } else if (this.onClickListener instanceof Function) {
                 onClickListener = this.onClickListener;
             } else {
                 console.error("点击监听设置错误");
                 return;
             }
-            onClickListener.call(this.page, view);
+            onClickListener.call(this.listenerLocation, view);
         } else {
             if (this.fatherView) {
                 this.fatherView.callClickListener(view);
@@ -829,15 +854,16 @@ export default class GroupView extends ScrollView {
      * 使用ele创建控件
      * @param{Element} ele
      * @param{ViewManager} viewManager
+     * @param{View} listenerLocation
      * @returns {GroupView}
      */
-    static parseByEle(ele, viewManager) {
-        var groupView = new GroupView(viewManager);
+    static parseByEle(ele, viewManager, listenerLocation) {
+        var groupView = new GroupView(viewManager, listenerLocation);
         groupView.ele = ele;
         var viewDefault = groupView.setAttributeParam(ele);
         groupView.bindImage();
         groupView.scroller.init();
-        viewManager.eleToObject(groupView.scroller.ele, groupView);//往内部执行
+        viewManager.eleToObject(groupView.scroller.ele, groupView, listenerLocation);//往内部执行
         if (viewDefault) {
             viewManager.focusView = groupView;
         }

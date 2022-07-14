@@ -43,13 +43,9 @@ export default class HomePage extends Page {
     }
 
     onFocusChangeListener(view, hasFocus) {
-        console.log("焦点变化监听", hasFocus, view);
+
     }
 
-    onScrollingListener(){
-        //TODO 滚动不触发改监听
-        console.log(arguments)
-    }
 
     onResume() {
         // console.log(this.pageName + "-onResume");

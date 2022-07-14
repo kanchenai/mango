@@ -10,18 +10,29 @@
     border-radius: 0px;
 }
 
-.point_list{
-    width: 80px;
-    height: 8px;
-    left: 1150px;
+
+.point_list {
+    width: 176px;
+    height: 12px;
+    left: 570px;
     top: 466px;
     overflow: hidden;
 }
 
+.point_list_bg{
+    width: 190px;
+    height: 26px;
+    left: 563px;
+    top: 459px;
+    background: #303030;
+    border-radius: 10px;
+    opacity: 0.7;
+}
+
 .point_list .item{
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
     background: white;
 }
 

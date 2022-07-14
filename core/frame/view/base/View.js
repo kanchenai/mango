@@ -7,21 +7,39 @@ export default class View {
     /**
      *
      * @param{ViewManager} viewManager
+     * @param{View} listenerLocation
      */
-    constructor(viewManager) {
+    constructor(viewManager, listenerLocation) {
         this.id = "";
         /**
          * View对应的节点
          * @type {HTMLElement}
          */
         this._ele = null;
-        //绑定的viewManager
+        /**
+         * 绑定的viewManager
+         */
         this.viewManager = viewManager;
-        //绑定的数据
+        /**
+         * 监听触发的对象
+         * 监听器内部this的指向
+         */
+        this._listenerLocation = listenerLocation;
+        /**
+         * 绑定的数据
+         * @type {object}
+         * @private
+         */
         this._data = null;
-        //所属父控件
+        /**
+         * 所属父控件
+         * @type {View}
+         */
         this.fatherView = null;
-        //包含的子控件
+        /**
+         * 包含的子控件
+         * @type {View[]}
+         */
         this.childViews = [];
         /**
          * 使用id做key，子控件做value，主要用于findViewById
@@ -33,7 +51,6 @@ export default class View {
          * @type {boolean}
          */
         this.focusable = false;
-
 
         /**
          * Page默认的显示变化监听
@@ -88,14 +105,14 @@ export default class View {
         var onVisibleChangeListener = null;
         if (this.onVisibleChangeListener) {
             if (typeof this.onVisibleChangeListener == "string") {
-                onVisibleChangeListener = this.page[this.onVisibleChangeListener];
+                onVisibleChangeListener = this.listenerLocation[this.onVisibleChangeListener];
             } else if (this.onVisibleChangeListener instanceof Function) {
                 onVisibleChangeListener = this.onVisibleChangeListener;
             } else {
                 console.error("显示变化监听设置错误");
                 return;
             }
-            onVisibleChangeListener.call(this.page, view, isShowing);
+            onVisibleChangeListener.call(this.listenerLocation, view, isShowing);
         } else {
             if (this.fatherView) {
                 this.fatherView.callVisibleChangeListener(view, isShowing);
@@ -119,6 +136,18 @@ export default class View {
         this.setStyle("visibility", "");
         this.setStyle("display", "none");
         this.callVisibleChangeListener(this, false);
+    }
+
+    get listenerLocation(){
+        var value = this._listenerLocation;
+        if(!value){
+            value = this;
+        }
+        return value;
+    }
+
+    set listenerLocation(value){
+        this._listenerLocation = value;
     }
 
     /**
@@ -318,7 +347,7 @@ export default class View {
         } else {
             if (this.ele.hasAttribute("id")) {
                 console.warn("id的属性名是错误,请查看ele:");
-                console.warn("\t\t",this.ele);
+                console.warn("\t\t", this.ele);
             }
         }
 
@@ -587,10 +616,11 @@ export default class View {
      * 使用ele创建控件
      * @param{Element} ele
      * @param{ViewManager} viewManager
+     * @param{View} listenerLocation
      * @returns {View}
      */
-    static parseByEle(ele, viewManager) {
-        var view = new View(viewManager);
+    static parseByEle(ele, viewManager, listenerLocation) {
+        var view = new View(viewManager, listenerLocation);
         view.ele = ele;
         view.setAttributeParam();
         return view;

@@ -2,8 +2,8 @@ import GroupView from "./GroupView";
 import State from "../../util/State";
 
 export default class Fragment extends GroupView {
-    constructor(viewManager) {
-        super(viewManager);
+    constructor(viewManager, listenerLocation) {
+        super(viewManager, listenerLocation);
         this.isForeground = false;
         this.lifeState = State.LifeState.BEFORE_CREATE;
     }
@@ -77,7 +77,7 @@ export default class Fragment extends GroupView {
             this.ele = ele;
             this.width = this.fatherView.width;
             this.height = this.fatherView.height;
-            this.setStyle("overflow","hidden");
+            this.setStyle("overflow", "hidden");
         }
     }
 }

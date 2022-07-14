@@ -1,16 +1,16 @@
 import GroupView from "./GroupView";
 
 export default class Dialog extends GroupView {
-    constructor(viewManager,html) {
-        super(viewManager);
+    constructor(viewManager, listenerLocation) {
+        super(viewManager, listenerLocation);
         this.focusable = false;
         //page的返回事件
         this.pageKeyBack = null;
 
-        if(html){
-            buildEle(this);//TODO dialog是否可以完全脱离page中的布局，需要验证
-            this.html = html;
-        }
+        // if(html){
+        //     buildEle(this);//TODO dialog是否可以完全脱离page中的布局，需要验证
+        //     this.html = html;
+        // }
     }
 
     show() {
@@ -64,15 +64,16 @@ export default class Dialog extends GroupView {
      * 使用ele创建控件
      * @param{Element} ele
      * @param{ViewManager} viewManager
+     * @param{View} listenerLocation
      * @returns {Dialog}
      */
-    static parseByEle(ele, viewManager) {
-        var dialog = new Dialog(viewManager);
+    static parseByEle(ele, viewManager, listenerLocation) {
+        var dialog = new Dialog(viewManager, listenerLocation);
         dialog.ele = ele;
         dialog.setAttributeParam(ele);
         dialog.scroller.init();
         dialog.bindImage();
-        viewManager.eleToObject(dialog.scroller.ele, dialog);//往内部执行
+        viewManager.eleToObject(dialog.scroller.ele, dialog, listenerLocation);//往内部执行
         return dialog;
     }
 }
@@ -81,7 +82,7 @@ export default class Dialog extends GroupView {
  * 创建dialog的ele
  * TODO 未确认效果，需要调试下
  */
-var buildEle = function (dialog){
+var buildEle = function (dialog) {
     var ele = document.createElement("div");
     dialog.ele = ele;
     dialog.width = dialog.page.width;

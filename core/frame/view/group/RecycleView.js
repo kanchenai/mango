@@ -8,8 +8,8 @@ import VPosition from "@core/frame/util/VPosition";
  *
  */
 export default class RecycleView extends GroupView {
-    constructor(viewManager) {
-        super(viewManager);
+    constructor(viewManager, listenerLocation) {
+        super(viewManager, listenerLocation);
         /**
          * 滚动位置
          * @type {object}
@@ -484,8 +484,8 @@ export default class RecycleView extends GroupView {
         return super.setAttributeParam();
     }
 
-    static parseByEle(ele, viewManager) {
-        var recycleView = new RecycleView(viewManager);
+    static parseByEle(ele, viewManager, listenerLocation) {
+        var recycleView = new RecycleView(viewManager, listenerLocation);
         recycleView.ele = ele;
         var viewDefault = recycleView.setAttributeParam();
 
@@ -654,11 +654,11 @@ export class Holder {
  * 用于RecycleView的每一个子控件的组件
  */
 export class Component extends GroupView {
-    constructor(viewManager) {
-        super(viewManager);
+    constructor(viewManager, listenerLocation, holder) {
+        super(viewManager, listenerLocation);
         this._data = null;
         this.ele = document.createElement("div");
-        this.holder = null;
+        this.holder = holder;
         /**
          * 内部节点
          * @type {Map<String, Element>}
@@ -669,6 +669,32 @@ export class Component extends GroupView {
     addChild(view) {
         super.addChild(view);
         view.data = this.data;
+    }
+
+    set html(html) {
+        //初始化滚动器
+        this.scroller.init();
+        //将html设置到节点中
+        this.scroller.html = html;
+        //业务层触发的，listenerLocation为this
+        this.listenerLocation = this.holder.recycleView.listenerLocation;
+        //构建控件
+        this.viewManager.buildView(this);
+        //测量滚动器实际大小，并设置
+        this.measure();
+        //绑定ImageView
+        this.bindImage();
+
+        var that = this;
+        setTimeout(function () {
+            if (that.isShowing) {//显示
+                that.loadImageResource();//加载图片
+            }
+        }, 50);
+    }
+
+    get html() {
+        return this.scroller.html;
     }
 
     callFocusChangeListener(view, hasFocus, intercept) {
@@ -716,8 +742,7 @@ export class Component extends GroupView {
  * @returns {Component}
  */
 var buildComponent = function (holder) {
-    var component = new Component(holder.recycleView.viewManager);
-    component.holder = holder;
+    var component = new Component(holder.recycleView.viewManager, holder.recycleView.listenerLocation, holder);
     if (!holder.recycleView.ele.contains(component.ele)) {//如果该ele未被渲染
         holder.recycleView.appendChild(component.ele);//渲染
     }
