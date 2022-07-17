@@ -477,6 +477,11 @@ export default class GroupView extends ScrollView {
             if (!child.isShowing) {
                 continue;
             }
+
+            if(child instanceof GroupView && child.childViews.length == 0){
+                continue;
+            }
+
             var nextUpMiddle = GroupView.getUpMiddlePosition(child);
             if (upMiddlePosition.top <= nextUpMiddle.top) {//在当前的下方
                 continue;
@@ -530,6 +535,10 @@ export default class GroupView extends ScrollView {
             }
 
             if (!child.isShowing) {
+                continue;
+            }
+
+            if(child instanceof GroupView && child.childViews.length == 0){
                 continue;
             }
 
@@ -589,6 +598,10 @@ export default class GroupView extends ScrollView {
                 continue;
             }
 
+            if(child instanceof GroupView && child.childViews.length == 0){
+                continue;
+            }
+
             var nextLeftMiddle = GroupView.getLeftMiddlePosition(child);
             if (leftMiddlePosition.left <= nextLeftMiddle.left) {//在当前的右边
                 continue;
@@ -644,6 +657,11 @@ export default class GroupView extends ScrollView {
             if (!child.isShowing) {
                 continue;
             }
+
+            if(child instanceof GroupView && child.childViews.length == 0){
+                continue;
+            }
+
 
             var nextRightMiddle = GroupView.getRightMiddlePosition(child);
             if (rightMiddlePosition.left >= nextRightMiddle.left) {//在当前的左边

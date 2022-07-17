@@ -12,7 +12,7 @@
 
 
 .point_list {
-    width: 176px;
+    width: 181px;
     height: 12px;
     left: 570px;
     top: 466px;
@@ -22,7 +22,7 @@
 .point_list_bg{
     width: 190px;
     height: 26px;
-    left: 563px;
+    left: 561px;
     top: 459px;
     background: #303030;
     border-radius: 10px;
@@ -56,6 +56,10 @@
     white-space: nowrap;
     line-height: 31px;
     font-size: 20px;
+}
+
+.item_focus {
+    /*-webkit-transform: scale(1.05);*/
 }
 
 .focus{
@@ -165,4 +169,74 @@
 
 .ace_program .item .info{
     top: 362px;
+}
+
+.coming_soon_line{
+    width: 1280px;
+    height: 1px;
+    top: 3115px;
+    background: #eb692c;
+    z-index: 1;
+}
+
+.coming_soon{
+    width: 1248px;
+    height: 380px;
+    top: 3083px;
+    /*overflow: hidden;*/
+    left: 16px;
+}
+
+.coming_soon .time{
+    width: 171px;
+    height: 14px;
+    font-size: 14px;
+    line-height: 14px;
+    color: white;
+    text-align: center;
+}
+
+.coming_soon .point{
+    width: 7px;
+    height: 7px;
+    border-radius: 4px;
+    top: 29px;
+    left: 82px;
+    background: #eb692c;
+}
+
+.coming_soon .poster .item{
+    width: 171px;
+    height: 246px;
+    top: 48px;
+
+}
+
+.coming_soon .poster .focus,
+.coming_soon .poster img{
+    width: 165px;
+    height: 240px;
+}
+
+.coming_soon .poster .txt{
+    width: 171px;
+    top: 260px;
+    text-align: center;
+}
+
+.coming_soon .button .item{
+    width: 171px;
+    height: 40px;
+    top: 333px;
+}
+
+.coming_soon .button .pic img,
+.coming_soon .button .focus{
+    width: 80px;
+    height: 34px;
+    left: 43px;
+}
+
+.coming_soon .button .focus{
+    border-radius: 19px;
 }

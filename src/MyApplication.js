@@ -2,7 +2,6 @@ import Application from "../core/frame/app/Application";
 import HomePage from "./page/HomePage";
 import IptvPlayer from "@core/frame/player/IptvPlayer";
 import WebPlayer from "@src/util/WebPlayer";
-import {PlayInfo} from "@core/frame/player/VideoPlayer";
 
 require('./global_style.css')
 

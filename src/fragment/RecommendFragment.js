@@ -17,6 +17,14 @@ import history_0 from "@images-js/home/recommend_fragment/history_0.png";
 import history_1 from "@images-js/home/recommend_fragment/history_1.png";
 import history_2 from "@images-js/home/recommend_fragment/history_2.png";
 import history_3 from "@images-js/home/recommend_fragment/history_3.png";
+import coming_soon_0 from "@images-js/home/recommend_fragment/coming_soon_0.png"
+import coming_soon_1 from "@images-js/home/recommend_fragment/coming_soon_1.png"
+import coming_soon_2 from "@images-js/home/recommend_fragment/coming_soon_2.png"
+import coming_soon_3 from "@images-js/home/recommend_fragment/coming_soon_3.png"
+import coming_soon_4 from "@images-js/home/recommend_fragment/coming_soon_4.png"
+import coming_soon_5 from "@images-js/home/recommend_fragment/coming_soon_5.png"
+import coming_soon_6 from "@images-js/home/recommend_fragment/coming_soon_6.png"
+
 import {ScrollCenter} from "@core/frame/view/group/GroupView";
 
 export default class RecommendFragment extends Fragment {
@@ -29,8 +37,6 @@ export default class RecommendFragment extends Fragment {
     }
 
     initView() {
-        // this.scrollLocate = ScrollCenter;
-
         this.carousel = this.findViewById("carousel");
         this.carousel.focusable = false;//在焦点判断时跳过
         this.carousel.orientation = HORIZONTAL;
@@ -49,6 +55,11 @@ export default class RecommendFragment extends Fragment {
         this.history.orientation = HORIZONTAL;
         this.history.adapter = new HistoryAdapter();
         this.history.data = history;
+
+        this.coming_soon = this.findViewById("coming_soon");
+        this.coming_soon.orientation = HORIZONTAL;
+        this.coming_soon.adapter = new ComingSoonAdapter();
+        this.coming_soon.data = comingSoon;
     }
 
     setView() {
@@ -99,6 +110,49 @@ var history = [
     }
 ];
 
+var comingSoon = [
+    {
+        time:"明天 00：00",
+        pic:coming_soon_0,
+        name:"精灵旅社4"
+    },
+    {
+        time:"7-14 12:00",
+        pic:coming_soon_1,
+        name:"密室大逃脱4"
+    },
+    {
+        time:"7-16 22:00",
+        pic:coming_soon_2,
+        name:"牧野家族"
+    },
+    {
+        time:"07-27 10：00",
+        pic:coming_soon_3,
+        name:"少年白马醉春风"
+    },
+    {
+        time:"即将上线",
+        pic:coming_soon_4,
+        name:"从前慢·白首要相离"
+    },
+    {
+        time:"即将上线",
+        pic:coming_soon_5,
+        name:"式微"
+    },
+    {
+        time:"即将上线",
+        pic:coming_soon_6,
+        name:"虚颜"
+    },
+    {
+        time:"即将上线",
+        pic:coming_soon_0,
+        name:"精灵旅社4"
+    },
+];
+
 class CarouselAdapter extends Adapter {
     bindHolder(holder, data) {
         var big_picture = holder.findEleById("big_picture");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
@@ -121,6 +175,19 @@ class HistoryAdapter extends Adapter {
         pic.src = data.pic;
         txt.innerText = data.name;
         info.innerText = data.info;
+
+    }
+}
+
+class ComingSoonAdapter extends Adapter {
+    bindHolder(holder, data) {
+        var time = holder.findEleById("time")
+        var pic = holder.findEleById("pic");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
+        // var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
+        var txt = holder.findEleById("txt");//TODO 使用TextView文字不显示
+        time.innerText = data.time;
+        pic.src = data.pic;
+        txt.innerText = data.name;
 
     }
 }
