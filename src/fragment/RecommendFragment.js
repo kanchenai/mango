@@ -70,86 +70,87 @@ export default class RecommendFragment extends Fragment {
 
     }
 
-    onScrollingListener(scrollView,x,y){
-        //TODO 滚动监听不触发
-        console.log(arguments)
+    onClickListener(view) {
+        console.log(view);
     }
 
+    onScrollingListener(scrollView, x, y) {
+    }
 }
 
 var bigPictureList = [
-    big_picture_0,big_picture_1,big_picture_2,big_picture_3,big_picture_4,
-    big_picture_5,big_picture_6,big_picture_7,big_picture_8,big_picture_9
+    big_picture_0, big_picture_1, big_picture_2, big_picture_3, big_picture_4,
+    big_picture_5, big_picture_6, big_picture_7, big_picture_8, big_picture_9
 ];
 
 var history = [
     {
-        pic:history_0,
-        name:"向往的生活 第六季",
-        info:"第07-08期"
+        pic: history_0,
+        name: "向往的生活 第六季",
+        info: "第07-08期"
     },
     {
-        pic:history_1,
-        name:"乘风破浪 第三季",
-        info:"05-20"
+        pic: history_1,
+        name: "乘风破浪 第三季",
+        info: "05-20"
     },
     {
-        pic:history_2,
-        name:"向往的生活 第五季",
-        info:"第04-23期"
+        pic: history_2,
+        name: "向往的生活 第五季",
+        info: "第04-23期"
     },
     {
-        pic:history_3,
-        name:"声生不息",
-        info:"第05-15期"
+        pic: history_3,
+        name: "声生不息",
+        info: "第05-15期"
     },
     {
-        pic:history_0,
-        name:"向往的生活 第六季",
-        info:"第07-08期"
+        pic: history_0,
+        name: "向往的生活 第六季",
+        info: "第07-08期"
     }
 ];
 
 var comingSoon = [
     {
-        time:"明天 00：00",
-        pic:coming_soon_0,
-        name:"精灵旅社4"
+        time: "明天 00：00",
+        pic: coming_soon_0,
+        name: "精灵旅社4"
     },
     {
-        time:"7-14 12:00",
-        pic:coming_soon_1,
-        name:"密室大逃脱4"
+        time: "7-14 12:00",
+        pic: coming_soon_1,
+        name: "密室大逃脱4"
     },
     {
-        time:"7-16 22:00",
-        pic:coming_soon_2,
-        name:"牧野家族"
+        time: "7-16 22:00",
+        pic: coming_soon_2,
+        name: "牧野家族"
     },
     {
-        time:"07-27 10：00",
-        pic:coming_soon_3,
-        name:"少年白马醉春风"
+        time: "07-27 10：00",
+        pic: coming_soon_3,
+        name: "少年白马醉春风"
     },
     {
-        time:"即将上线",
-        pic:coming_soon_4,
-        name:"从前慢·白首要相离"
+        time: "即将上线",
+        pic: coming_soon_4,
+        name: "从前慢·白首要相离"
     },
     {
-        time:"即将上线",
-        pic:coming_soon_5,
-        name:"式微"
+        time: "即将上线",
+        pic: coming_soon_5,
+        name: "式微"
     },
     {
-        time:"即将上线",
-        pic:coming_soon_6,
-        name:"虚颜"
+        time: "即将上线",
+        pic: coming_soon_6,
+        name: "虚颜"
     },
     {
-        time:"即将上线",
-        pic:coming_soon_0,
-        name:"精灵旅社4"
+        time: "即将上线",
+        pic: coming_soon_0,
+        name: "精灵旅社4"
     },
 ];
 
@@ -199,10 +200,11 @@ var onFocusChangeListenerPoint = function (view, hasFocus) {
 
 
         var that = this;
-        setTimeout(function (){
-            if(that.scrollTop != 0){
+        setTimeout(function () {
+            if (that.scrollTop != 0) {
                 that.scrollVerticalTo(0);
             }
-        },0)
+        }, 0)
     }
 }
+

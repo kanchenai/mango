@@ -45,13 +45,6 @@ export default class GroupView extends ScrollView {
         this.measure();
         //绑定ImageView
         this.bindImage();
-
-        var that = this;
-        setTimeout(function () {
-            if (that.isShowing) {//显示
-                that.loadImageResource();//加载图片
-            }
-        }, 50);
     }
 
     get html() {
@@ -107,6 +100,7 @@ export default class GroupView extends ScrollView {
      * @param{boolean} isShowing
      */
     callVisibleChangeListener(view, isShowing) {
+        this.loadImageResource(true);//这个方法会向子控件迭代加载图片
         var onVisibleChangeListener = null;
         if (this.onVisibleChangeListener) {
             if (typeof this.onVisibleChangeListener == "string") {
@@ -117,7 +111,6 @@ export default class GroupView extends ScrollView {
                 console.error("显示变化监听设置错误");
                 return;
             }
-            this.loadImageResource();//这个方法会向子控件迭代加载图片
             onVisibleChangeListener.call(this.listenerLocation, view, isShowing);
         } else {
             if (this.fatherView) {
@@ -136,6 +129,7 @@ export default class GroupView extends ScrollView {
      * @param{boolean} intercept 是否拦截（在子控件中已设置监听，不需要触发父控件的）
      */
     callFocusChangeListener(view, hasFocus, intercept) {
+        this.loadImageResource(false);//GroupView本身不会上焦，都是由子控件触发，不需要向子控件迭代加载图片
         var onFocusChangeListener = null;
         if (this.onFocusChangeListener && !intercept) {
             if (typeof this.onFocusChangeListener == "string") {
@@ -146,7 +140,6 @@ export default class GroupView extends ScrollView {
                 console.error("焦点变化监听设置错误");
                 return;
             }
-            this.loadImageResource();//这个方法会向子控件迭代加载图片
             onFocusChangeListener.call(this.listenerLocation, view, hasFocus);
             intercept = true;
         }
@@ -402,12 +395,19 @@ export default class GroupView extends ScrollView {
     /**
      * 加载当前控件绑定的图片资源
      * 就是把图片url设置到对应节点的src
+     * @param{boolean} intoChild 是否调用子控件的loadImageResource
      */
-    loadImageResource() {
+    loadImageResource(intoChild) {
         super.loadImageResource();
 
-        for (var child of this.childViews) {
-            child.loadImageResource();
+        if(intoChild){
+            for (var child of this.childViews) {
+                if(child instanceof GroupView){
+                    child.loadImageResource(true);
+                }else{
+                    child.loadImageResource();
+                }
+            }
         }
     }
 
@@ -478,7 +478,7 @@ export default class GroupView extends ScrollView {
                 continue;
             }
 
-            if(child instanceof GroupView && child.childViews.length == 0){
+            if (child instanceof GroupView && child.childViews.length == 0) {
                 continue;
             }
 
@@ -538,7 +538,7 @@ export default class GroupView extends ScrollView {
                 continue;
             }
 
-            if(child instanceof GroupView && child.childViews.length == 0){
+            if (child instanceof GroupView && child.childViews.length == 0) {
                 continue;
             }
 
@@ -598,7 +598,7 @@ export default class GroupView extends ScrollView {
                 continue;
             }
 
-            if(child instanceof GroupView && child.childViews.length == 0){
+            if (child instanceof GroupView && child.childViews.length == 0) {
                 continue;
             }
 
@@ -658,7 +658,7 @@ export default class GroupView extends ScrollView {
                 continue;
             }
 
-            if(child instanceof GroupView && child.childViews.length == 0){
+            if (child instanceof GroupView && child.childViews.length == 0) {
                 continue;
             }
 
@@ -737,8 +737,13 @@ export default class GroupView extends ScrollView {
     static focusViewGroup(view, groupView) {
         if (!Keyboard.KEY_CODE) {//无动作，直接代码上焦
             for (var i = 0; i < groupView.childViews.length; i++) {
-                if (groupView.childViews[i].focusable) {
-                    groupView.childViews[i].requestFocus();
+                var child = groupView.childViews[i];
+                if (child.focusable) {
+                    if (child instanceof GroupView && child.childViews.length == 0) {
+                        continue;
+                    } else {
+                        child.requestFocus();
+                    }
                     break;
                 }
             }
@@ -797,7 +802,11 @@ export default class GroupView extends ScrollView {
             }
 
             if (!child.focusable) {
-                continue
+                continue;
+            }
+
+            if (child instanceof GroupView && child.childViews.length == 0) {
+                continue;
             }
 
             var position = child.positionByFather;
