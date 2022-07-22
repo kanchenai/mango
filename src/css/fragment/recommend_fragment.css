@@ -125,11 +125,12 @@
     width: 1280px;
     height: 490px;
     top: 786px;
+    overflow: hidden;
 }
 
 .season_hot .item{
     width: 306px;
-    height: 176px;
+    height: 220px;
 }
 
 .season_hot .focus,
@@ -140,6 +141,8 @@
 
 .season_hot .item .txt{
     top: 182px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .season_hot .item .info{
