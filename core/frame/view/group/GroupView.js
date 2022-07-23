@@ -735,7 +735,7 @@ export default class GroupView extends ScrollView {
     };
 
     static focusViewGroup(view, groupView) {
-        if (!Keyboard.KEY_CODE) {//无动作，直接代码上焦
+        if (!Keyboard.KEY_CODE || Keyboard.KEY_CODE == Keyboard.KEY_OK) {//无动作，直接代码上焦
             for (var i = 0; i < groupView.childViews.length; i++) {
                 var child = groupView.childViews[i];
                 if (child.focusable) {

@@ -243,3 +243,83 @@
 .coming_soon .button .focus{
     border-radius: 19px;
 }
+
+.big_poster{
+    width: 1258px;
+    height: 720px;
+    left: 22px;
+    top: 4256px;
+    overflow: hidden;
+}
+
+.big_poster .poster{
+    width: 618px;
+    height: 450px;
+}
+
+.big_poster .poster .item{
+    width: 618px;
+    height: 440px;
+}
+
+.big_poster .poster .focus,
+.big_poster .poster .pic img{
+    width: 612px;
+    height: 345px;
+}
+
+.big_poster .poster .txt{
+    top: 372px;
+    left: 73px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.big_poster .poster .info{
+    top: 411px;
+    left: 73px;
+}
+
+.big_poster .button{
+    top: 359px;
+}
+
+.big_poster .button .item{
+    width: 618px;
+    height: 85px;
+}
+
+.big_poster .button .small_poster img{
+    width: 61px;
+    height: 85px;
+    border-radius: 0px;
+}
+
+.big_poster .button .pic img,
+.big_poster .button .focus{
+    width: 87px;
+    height: 34px;
+    left: 500px;
+    top: 26px;
+}
+
+.big_poster .button .focus{
+    border-radius: 19px;
+}
+
+.back_top{
+    top: 4996px;
+}
+
+.back_top .item{
+    width: 1280px;
+    height: 44px;
+    font-size: 14px;
+    line-height: 44px;
+    text-align: center;
+    color: #606060;
+}
+
+.back_top .item_focus{
+    color: #eb692c;
+}

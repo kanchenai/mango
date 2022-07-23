@@ -4,8 +4,26 @@
     height: 720px;
 }
 
+.logo{
+    left: 25px;
+    top: 36px;
+    z-index: 1;
+}
+
+.logo img{
+    width: 24px;
+    height: 24px;
+}
+
+.logo .txt{
+    white-space: nowrap;
+    left: 26px;
+    font-size: 22px;
+    font-style:italic;
+}
+
 .navigation{
-    height: 33px;
+    height: 39px;
     width: 780px;
     left: 150px;
     top:28px;
@@ -13,43 +31,54 @@
     overflow: hidden;
 }
 
-.navigation .item,
+.navigation .item{
+    width: 66px;
+    height: 39px;
+}
+
 .navigation .focus{
     width: 60px;
     height: 33px;
 }
 
 .navigation .focus{
-    background: #606060;
     border-radius: 7px;
+    /*border: 3px #eb692c solid;*/
+    background: #eb692c;
+    top: 3px;
+    left: 3px;
 }
 
 .navigation .item .txt{
     width: 60px;
-    height: 16px;
+    height: 33px;
     font-size: 16px;
-    line-height: 16px;
-    top: 5px;
+    line-height: 33px;
+    top: 3px;
+    left: 3px;
     color: #dfeaf4;
     text-align: center;
 }
 
 .navigation .item_focus .txt{
     width: 60px;
-    height: 23px;
+    height: 33px;
     font-size: 23px;
-    line-height: 23px;
-    top: 0px;
+    top: 3px;
     color: white;
     text-align: center;
+}
+
+.navigation .item_select .txt{
+    color: #eb692c;
 }
 
 .navigation .select{
     width: 10px;
     height: 2px;
-    background: white;
-    top: 31px;
-    left: 25px;
+    background: #eb692c;
+    top: 34px;
+    left: 28px;
 }
 
 .navigation .item_focus .select,

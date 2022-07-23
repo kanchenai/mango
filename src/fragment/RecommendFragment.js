@@ -48,7 +48,22 @@ import like_20 from "@images-js/home/recommend_fragment/like_20.png"
 import like_21 from "@images-js/home/recommend_fragment/like_21.png"
 import like_22 from "@images-js/home/recommend_fragment/like_22.png"
 import like_23 from "@images-js/home/recommend_fragment/like_23.png"
-
+import big_poster_0 from "@images-js/home/recommend_fragment/big_poster_0.png"
+import big_poster_1 from "@images-js/home/recommend_fragment/big_poster_1.png"
+import big_poster_2 from "@images-js/home/recommend_fragment/big_poster_2.png"
+import big_poster_3 from "@images-js/home/recommend_fragment/big_poster_3.png"
+import big_poster_4 from "@images-js/home/recommend_fragment/big_poster_4.png"
+import big_poster_5 from "@images-js/home/recommend_fragment/big_poster_5.png"
+import big_poster_6 from "@images-js/home/recommend_fragment/big_poster_6.png"
+import big_poster_7 from "@images-js/home/recommend_fragment/big_poster_7.png"
+import small_poster_0 from "@images-js/home/recommend_fragment/small_poster_0.png"
+import small_poster_1 from "@images-js/home/recommend_fragment/small_poster_1.png"
+import small_poster_2 from "@images-js/home/recommend_fragment/small_poster_2.png"
+import small_poster_3 from "@images-js/home/recommend_fragment/small_poster_3.png"
+import small_poster_4 from "@images-js/home/recommend_fragment/small_poster_4.png"
+import small_poster_5 from "@images-js/home/recommend_fragment/small_poster_5.png"
+import small_poster_6 from "@images-js/home/recommend_fragment/small_poster_6.png"
+import small_poster_7 from "@images-js/home/recommend_fragment/small_poster_7.png"
 
 import {ScrollCenter} from "@core/frame/view/group/GroupView";
 
@@ -70,6 +85,7 @@ export default class RecommendFragment extends Fragment {
 
         this.point_list = this.findViewById("point_list");
         this.point_list.orientation = HORIZONTAL;
+        this.point_list.select = true;
         this.point_list.onFocusChangeListener = onFocusChangeListenerPoint;
         this.point_list.margin = new VMargin(0, 0, 3, 3);
         this.point_list.adapter = new PointAdapter();
@@ -92,6 +108,12 @@ export default class RecommendFragment extends Fragment {
         this.like.adapter = new LikeAdapter();
         this.like.data = likeData;
 
+        this.big_poster = this.findViewById("big_poster");
+        this.big_poster.col = 2;
+        this.big_poster.margin.top = 10;
+        this.big_poster.adapter = new BigPosterAdapter();
+        this.big_poster.data = bigPosterData;
+
     }
 
     setView() {
@@ -104,9 +126,24 @@ export default class RecommendFragment extends Fragment {
 
     onClickListener(view) {
         console.log(view);
+        if (view.id == "back_top") {
+            this.point_list.requestFocus();
+        }
     }
 
     onScrollingListener(scrollView, x, y) {
+        if(scrollView == this){
+            if (y > 300) {
+                if(this.page.navigation.isShowing){
+                    this.page.navigation.hide();
+                }
+            }else{
+                if(!this.page.navigation.isShowing){
+                    this.page.navigation.show();
+                }
+            }
+        }
+
     }
 }
 
@@ -308,6 +345,58 @@ var likeData = [
         info: "擎锋上当了"
     }
 ];
+
+var bigPosterData = [
+    {
+        big_poster: big_poster_0,
+        small_poster: small_poster_0,
+        name: "大侦探第七季07案：蔷薇下的罪恶（上）",
+        info: "07案：蔷薇下的罪恶（上）"
+    },
+    {
+        big_poster: big_poster_1,
+        small_poster: small_poster_1,
+        name: "乘风破浪的姐姐第二季第10期：四公帮唱竞演赛（下）",
+        info: "第10期：四公帮唱竞演赛（下）"
+    },
+    {
+        big_poster: big_poster_2,
+        small_poster: small_poster_2,
+        name: "向往的生活第六季第5期：彩灯小H大战吓飞张艺兴",
+        info: "第5期：彩灯吓飞张艺兴"
+    },
+    {
+        big_poster: big_poster_3,
+        small_poster: small_poster_3,
+        name: "中餐厅第五季第11期：姐姐们来做客啦！上演唱跳秀嗨爆全场",
+        info: "第11期：姐姐唱跳秀嗨爆全场"
+    },
+    {
+        big_poster: big_poster_4,
+        small_poster: small_poster_4,
+        name: "时光音乐会第2期：左麟右李重温友情音乐岁月",
+        info: "第2期：左麟右李重温友情音乐岁月"
+    },
+    {
+        big_poster: big_poster_5,
+        small_poster: small_poster_5,
+        name: "2022湖南好有味：八大院士重磅加盟好有味！",
+        info: "2022湖南好有味"
+    },
+    {
+        big_poster: big_poster_6,
+        small_poster: small_poster_6,
+        name: "中餐厅第四季第7期：刘宇宁首日上岗被误认成张亮",
+        info: "第七期：赵丽颖哄娃一秒止哭"
+    },
+    {
+        big_poster: big_poster_7,
+        small_poster: small_poster_7,
+        name: "谢谢让我遇见你 第16集",
+        info: "新的开始"
+    }
+];
+
 class CarouselAdapter extends Adapter {
     bindHolder(holder, data) {
         var big_picture = holder.findEleById("big_picture");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
@@ -347,7 +436,7 @@ class ComingSoonAdapter extends Adapter {
     }
 }
 
-class LikeAdapter extends Adapter{
+class LikeAdapter extends Adapter {
     bindHolder(holder, data) {
         var pic = holder.findEleById("pic");
         var txt = holder.findViewById("txt");
@@ -356,6 +445,21 @@ class LikeAdapter extends Adapter{
         pic.src = data.pic;
         txt.text = data.name;
         info.innerText = data.info;
+
+    }
+}
+
+class BigPosterAdapter extends Adapter {
+    bindHolder(holder, data) {
+        var big_poster = holder.findEleById("big_poster");
+        var txt = holder.findViewById("txt");
+        var info = holder.findEleById("info");
+        var small_poster = holder.findEleById("small_poster");
+        //
+        big_poster.src = data.big_poster;
+        txt.text = data.name;
+        info.innerText = data.info;
+        small_poster.src = data.small_poster;
 
     }
 }

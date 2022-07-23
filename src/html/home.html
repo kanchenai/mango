@@ -1,11 +1,18 @@
 <template>
     <div class="bg"></div>
-    <div class="navigation" view-focus view-type="recycle" view-id="navigation">
+<!--    <div class="logo">-->
+<!--        <img src="../images/home/mango_logo.png" alt="">-->
+<!--        <div class="txt">芒果TV</div>-->
+<!--    </div>-->
+    <div class="navigation" view-focus
+         view-type="recycle"
+         view-up="none" view-left="none"
+         view-id="navigation">
         <div class="item" view-type="item">
             <div class="focus"></div>
             <div class="select"></div>
-            <div class="txt">精选</div>
+            <div class="txt" view-id="txt">精选</div>
         </div>
     </div>
-    <div class="frame" view-type="frame" view-id="frame"></div>
+    <div class="frame" view-type="frame" view-up="navigation" view-id="frame"></div>
 </template>
