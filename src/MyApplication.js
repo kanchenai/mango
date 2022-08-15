@@ -2,6 +2,7 @@ import Application from "../core/frame/app/Application";
 import HomePage from "./page/HomePage";
 import IptvPlayer from "@core/frame/player/IptvPlayer";
 import WebPlayer from "@src/util/WebPlayer";
+import DetailPage from "@page/DetailPage";
 
 require('./global_style.css')
 
@@ -12,6 +13,9 @@ export default class MyApplication extends Application {
             var page = null;
             switch (pageName) {
                 case "HomePage":
+                    page = new HomePage();
+                    break;
+                case "DetailPage":
                     page = new HomePage();
                     break;
             }
@@ -26,6 +30,9 @@ export default class MyApplication extends Application {
         switch (urlParam.pageKey) {
             case "home":
                 firstPage = new HomePage();
+                break;
+            case "detail":
+                firstPage = new DetailPage();
                 break;
             default:
                 firstPage = new HomePage();

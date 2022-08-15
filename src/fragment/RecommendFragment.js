@@ -66,6 +66,7 @@ import small_poster_6 from "@images-js/home/recommend_fragment/small_poster_6.pn
 import small_poster_7 from "@images-js/home/recommend_fragment/small_poster_7.png"
 
 import {ScrollCenter} from "@core/frame/view/group/GroupView";
+import DetailPage from "@page/DetailPage";
 
 export default class RecommendFragment extends Fragment {
     onCreate() {
@@ -128,6 +129,9 @@ export default class RecommendFragment extends Fragment {
         console.log(view);
         if (view.id == "back_top") {
             this.point_list.requestFocus();
+        }else{
+            let detailPage = new DetailPage();
+            this.startPage(detailPage);
         }
     }
 
@@ -399,8 +403,8 @@ var bigPosterData = [
 
 class CarouselAdapter extends Adapter {
     bindHolder(holder, data) {
-        var big_picture = holder.findEleById("big_picture");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
-        // var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
+        // var big_picture = holder.findEleById("big_picture");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
+        var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
         big_picture.src = data;
     }
 }

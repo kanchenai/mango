@@ -8,6 +8,10 @@ export default class Fragment extends GroupView {
         this.lifeState = State.LifeState.BEFORE_CREATE;
     }
 
+    startPage(page,param){
+        this.page.startPage(page,param)
+    }
+
     switchToForeground() {
         if (this.lifeState == State.LifeState.BEFORE_CREATE) {
             this.create();
