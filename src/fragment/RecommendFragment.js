@@ -416,7 +416,7 @@ class PointAdapter extends Adapter {
 
 class HistoryAdapter extends Adapter {
     bindHolder(holder, data) {
-        var pic = holder.findEleById("pic");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
+        var pic = holder.findViewById("pic");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
         // var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
         var txt = holder.findEleById("txt");//TODO 使用TextView文字不显示
         var info = holder.findEleById("info");
@@ -430,7 +430,7 @@ class HistoryAdapter extends Adapter {
 class ComingSoonAdapter extends Adapter {
     bindHolder(holder, data) {
         var time = holder.findEleById("time")
-        var pic = holder.findEleById("pic");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
+        var pic = holder.findViewById("pic");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
         // var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
         var txt = holder.findEleById("txt");//TODO 使用TextView文字不显示
         time.innerText = data.time;
@@ -442,7 +442,7 @@ class ComingSoonAdapter extends Adapter {
 
 class LikeAdapter extends Adapter {
     bindHolder(holder, data) {
-        var pic = holder.findEleById("pic");
+        var pic = holder.findViewById("pic");
         var txt = holder.findViewById("txt");
         var info = holder.findEleById("info");
 

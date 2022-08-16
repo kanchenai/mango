@@ -216,3 +216,104 @@
     overflow: hidden;
     white-space: nowrap;
 }
+
+.same_type{
+    width: 468px;
+    height: 160px;
+    top: 54px;
+    left: 804px;
+    overflow: hidden;
+}
+
+.same_type .item{
+    width: 154px;
+    height: 160px;
+}
+
+.same_type .focus,
+.same_type .pic img{
+    width: 148px;
+    height: 105px;
+}
+
+.same_type .txt{
+    width: 148px;
+    height: 14px;
+    left: 3px;
+    top: 116px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.same_type .info{
+    width: 148px;
+    height: 12px;
+    left: 3px;
+    top: 140px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.recommend{
+    width: 754px;
+    height: 140px;
+    left: 804px;
+    top: 284px;
+}
+
+.recommend .item{
+    width: 138px;
+    height: 130px;
+}
+
+.recommend .focus,
+.recommend .pic img{
+    width: 132px;
+    height: 76px;
+}
+
+.recommend .txt{
+    width: 320px;
+    height: 14px;
+    left: 146px;
+    top: 13px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.watch_too{
+    width: 462px;
+    height: 294px;
+    left: 804px;
+    top: 426px;
+    overflow: hidden;
+}
+
+.watch_too .item{
+    width: 462px;
+    height: 82px;
+}
+
+.watch_too .focus,
+.watch_too .pic img{
+    width: 132px;
+    height: 76px;
+}
+
+.watch_too .txt{
+    width: 320px;
+    height: 14px;
+    left: 146px;
+    top: 26px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.watch_too .info{
+    width: 320px;
+    height: 12px;
+    left: 146px;
+    top: 46px;
+    overflow: hidden;
+    white-space: nowrap;
+}
