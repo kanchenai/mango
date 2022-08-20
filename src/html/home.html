@@ -1,13 +1,13 @@
 <template>
     <div class="bg"></div>
-    <div class="top">
-        <!--    <div class="logo">-->
-        <!--        <img src="../images/home/mango_logo.png" alt="">-->
-        <!--        <div class="txt">芒果TV</div>-->
-        <!--    </div>-->
+    <div class="top" view-type="group" view-id="top_group">
+        <div class="logo">
+            <img src="../images/home/mango_logo.png" alt="">
+            <div class="txt">芒果TV</div>
+        </div>
         <div class="navigation" view-focus
              view-type="recycle"
-             view-up="none" view-left="none"
+             view-up="none" view-left="none" view-down="frame"
              view-id="navigation">
             <div class="item" view-type="item">
                 <div class="focus"></div>
@@ -16,13 +16,30 @@
             </div>
         </div>
         <div class="search">
-            <div class="item">
-                <div class="focus"></div>
+            <div class="item" view-type="item" view-id="search">
                 <div class="bg"></div>
-                <div class="icon"></div>
-                <div class="text"></div>
+                <div class="focus"></div>
+                <div class="icon"><img src="../images/home/icon_search.png"></div>
+                <div class="txt" view-type="text" view-id="key">快乐再出发加长加长加长加长加长加长</div>
             </div>
         </div>
+
+        <div class="content_lib">
+            <div class="item" view-type="item" view-id="content_lib">
+                <div class="bg"></div>
+                <div class="focus"></div>
+                <div class="txt">片库</div>
+            </div>
+        </div>
+
+        <div class="delivery">
+            <div class="item" view-type="item" view-id="delivery">
+                <div class="focus"><img src="../images/home/icon_delivery_focus.png" alt=""></div>
+                <div class="pic"><img src="../images/home/icon_delivery.png" alt=""></div>
+            </div>
+        </div>
+
+        <div class="top" style="top: 70px;"></div>
     </div>
 
     <div class="frame" view-type="frame" view-up="navigation" view-id="frame"></div>

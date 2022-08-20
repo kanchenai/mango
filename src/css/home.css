@@ -4,6 +4,13 @@
     height: 720px;
 }
 
+.top{
+    width: 1280px;
+    height: 70px;
+    overflow: hidden;
+    z-index: 1;
+}
+
 .logo{
     left: 25px;
     top: 36px;
@@ -89,6 +96,114 @@
 
 .navigation .item_select .select{
     display: block;
+}
+
+.search{
+    width: 175px;
+    height: 30px;
+    left: 950px;
+    top: 32px;
+}
+
+.search .item,
+.search .bg,
+.search .focus{
+    width: 175px;
+    height: 30px;
+}
+
+.search .bg{
+    background: gray;
+    opacity: 0.6;
+    border-radius: 15px;
+}
+
+.search .focus{
+    left: 0px;
+    top: 0px;
+    background: #ee682a;
+    border-radius: 15px;
+}
+
+.search .icon{
+    top: 9px;
+    left: 15px;
+}
+
+.search .icon img{
+    width: 11px;
+    height: 11px;
+}
+
+.search .txt{
+    width: 136px;
+    height: 30px;
+    left: 29px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 30px;
+}
+
+.content_lib{
+    width: 58px;
+    height: 30px;
+    left: 1140px;
+    top: 32px;
+}
+
+.content_lib .item,
+.content_lib .bg,
+.content_lib .focus{
+    width: 58px;
+    height: 30px;
+}
+
+.content_lib .bg{
+    background: gray;
+    opacity: 0.6;
+    border-radius: 15px;
+}
+
+.content_lib .focus{
+    left: 0px;
+    top: 0px;
+    background: #ee682a;
+    border-radius: 15px;
+}
+
+.content_lib .txt{
+    width: 58px;
+    height: 30px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 30px;
+    text-align: center;
+}
+
+.delivery{
+    width: 58px;
+    height: 30px;
+    left: 1225px;
+    top: 32px;
+}
+
+.delivery .item,
+.delivery .focus img,
+.delivery .pic img{
+    width: 20px;
+    height: 20px;
+}
+
+.delivery .focus,
+.delivery .pic{
+    left: 0px;
+    top: 5px;
+}
+
+.delivery .item_focus .pic{
+    display: none;
 }
 
 .frame{

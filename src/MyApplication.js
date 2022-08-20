@@ -3,6 +3,8 @@ import HomePage from "./page/HomePage";
 import IptvPlayer from "@core/frame/player/IptvPlayer";
 import WebPlayer from "@src/util/WebPlayer";
 import DetailPage from "@page/DetailPage";
+import ListPage from "@page/ListPage";
+import SearchPage from "@page/SearchPage";
 
 require('./global_style.css')
 
@@ -17,6 +19,12 @@ export default class MyApplication extends Application {
                     break;
                 case "DetailPage":
                     page = new HomePage();
+                    break;
+                case "ListPage":
+                    page = new ListPage();
+                    break;
+                case "SearchPage":
+                    page = new SearchPage();
                     break;
             }
             return page;
@@ -33,6 +41,12 @@ export default class MyApplication extends Application {
                 break;
             case "detail":
                 firstPage = new DetailPage();
+                break;
+            case "list":
+                firstPage = new ListPage();
+                break;
+            case "search":
+                firstPage = new SearchPage();
                 break;
             default:
                 firstPage = new HomePage();

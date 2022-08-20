@@ -138,13 +138,9 @@ export default class RecommendFragment extends Fragment {
     onScrollingListener(scrollView, x, y) {
         if(scrollView == this){
             if (y > 300) {
-                if(this.page.navigation.isShowing){
-                    this.page.navigation.hide();
-                }
+                this.page.navigationScrollDisappear();
             }else{
-                if(!this.page.navigation.isShowing){
-                    this.page.navigation.show();
-                }
+                this.page.navigationScrollDisplay();
             }
         }
 
@@ -403,8 +399,8 @@ var bigPosterData = [
 
 class CarouselAdapter extends Adapter {
     bindHolder(holder, data) {
-        // var big_picture = holder.findEleById("big_picture");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
-        var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
+        var big_picture = holder.findEleById("big_picture");//不做绝对的懒加载，但是在recycleView的回收机制下，也类似懒加载
+        // var big_picture = holder.findViewById("big_picture");//绝对的懒加载,图片加载会延后
         big_picture.src = data;
     }
 }

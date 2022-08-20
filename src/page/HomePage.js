@@ -20,6 +20,8 @@ import TeachingFragment from "@fragment/TeachingFragment";
 import DocumentaryFragment from "@fragment/DocumentaryFragment";
 import FashionFragment from "@fragment/FashionFragment";
 import LiveFragment from "@fragment/LiveFragment";
+import ListPage from "@page/ListPage";
+import SearchPage from "@page/SearchPage";
 
 export default class HomePage extends Page {
     constructor() {
@@ -35,6 +37,8 @@ export default class HomePage extends Page {
     }
 
     initView() {
+        this.top_group = this.findViewById("top_group");
+
         this.navigation = this.findViewById("navigation");
         this.navigation.select = true;
         this.navigation.orientation = HORIZONTAL;
@@ -72,14 +76,33 @@ export default class HomePage extends Page {
 
     }
 
+    navigationScrollDisappear() {
+        this.top_group.scrollVerticalTo(70);
+    }
+
+    navigationScrollDisplay() {
+        this.top_group.scrollVerticalTo(0);
+    }
+
     onClickListener(view) {
-        console.log(view.pageName, "-onClickListener", view);
+        if (view.id == "content_lib") {
+            var listPage = new ListPage();
+            this.startPage(listPage);
+        } else if (view.id == "search") {
+            var searchPage = new SearchPage();
+            var param = {
+                key:this.findViewById("search").findViewById("key").text
+            }
+            this.startPage(searchPage,param);
+        } else {
+
+        }
+        console.log(this.pageName, "-onClickListener", view);
     }
 
     onFocusChangeListener(view, hasFocus) {
 
     }
-
 
     onResume() {
         // console.log(this.pageName + "-onResume");
@@ -122,7 +145,7 @@ var onNavigationFocusChangeListener = function (view, hasFocus) {
         var index = (view.fatherView.holder.index + len) % len;
 
         // if(index <= 1){
-            this.frame.switchTo(index)
+        this.frame.switchTo(index)
         // }
     }
 }

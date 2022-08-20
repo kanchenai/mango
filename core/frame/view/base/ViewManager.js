@@ -47,50 +47,50 @@ export default class ViewManager {
     /**
      *
      * @param{Element} ele
-     * @param{GroupView} groupView
+     * @param{View} view
      * @param{View} listenerLocation
      */
-    eleToObject(ele, groupView,listenerLocation) {
+    eleToObject(ele, view,listenerLocation) {
         var ele_list = ele.children;
         for (var child_ele of ele_list) {
             var viewType = View.getViewType(child_ele);
             switch (viewType) {
                 case "VIEW":
-                    var view = View.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(view);
+                    var _view = View.parseByEle(child_ele, this, listenerLocation);
+                    view.addChild(_view);
                     break;
                 case "VIEW-ITEM":
                 case "ITEM":
                     var itemView = ItemView.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(itemView);
+                    view.addChild(itemView);
                     break;
                 case "VIEW-SCROLL":
                 case "SCROLL":
                     var scrollView = ScrollView.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(scrollView);
+                    view.addChild(scrollView);
                     break;
                 case "VIEW-GROUP":
                 case "GROUP":
                     var _groupView = GroupView.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(_groupView);
+                    view.addChild(_groupView);
                     break;
                 case "VIEW-FRAME":
                 case "FRAME":
                     var frameView = FrameView.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(frameView);
+                    view.addChild(frameView);
                     break;
                 case "VIEW-DIALOG":
                 case "DIALOG":
                     var dialog = Dialog.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(dialog);
+                    view.addChild(dialog);
                     break;
                 case "VIEW-RECYCLE":
                 case "RECYCLE":
                     var recycleView = RecycleView.parseByEle(child_ele, this, listenerLocation);
-                    groupView.addChild(recycleView);
+                    view.addChild(recycleView);
                     break;
                 default:
-                    this.eleToObject(child_ele, groupView, listenerLocation);
+                    this.eleToObject(child_ele, view, listenerLocation);
                     break;
             }
         }
