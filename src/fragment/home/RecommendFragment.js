@@ -1,6 +1,6 @@
 import Fragment from "@core/frame/view/group/Fragment";
 
-import html from "@html/fragment/recommend_fragment.html"
+import html from "@html/fragment/home/recommend_fragment.html"
 import {Adapter, HORIZONTAL} from "@core/frame/view/group/RecycleView";
 import VMargin from "@core/frame/util/VMargin";
 import big_picture_0 from "@images-js/home/recommend_fragment/big_picture_0.png";
@@ -65,7 +65,6 @@ import small_poster_5 from "@images-js/home/recommend_fragment/small_poster_5.pn
 import small_poster_6 from "@images-js/home/recommend_fragment/small_poster_6.png"
 import small_poster_7 from "@images-js/home/recommend_fragment/small_poster_7.png"
 
-import {ScrollCenter} from "@core/frame/view/group/GroupView";
 import DetailPage from "@page/DetailPage";
 
 export default class RecommendFragment extends Fragment {

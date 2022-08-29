@@ -1,7 +1,7 @@
 import Fragment from "@core/frame/view/group/Fragment";
-import html from "@html/fragment/movie_fragment.html"
+import html from "@html/fragment/home/drama_fragment.html"
 
-export default class MovieFragment extends Fragment{
+export default class GameFragment extends Fragment{
 
     onCreate() {
         this.html = html;
@@ -12,7 +12,7 @@ export default class MovieFragment extends Fragment{
     }
 
     initView() {
-        this.setStyle("background","red");
+        this.setStyle("background","#0c968e");
 
     }
 

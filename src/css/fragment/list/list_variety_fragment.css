@@ -1,0 +1,11 @@
+.filter_list{
+    width: 1280px;
+    height: 40px;
+    background: #eb692c;
+}
+
+.filter_list .item,
+.filter_list .focus,
+.filter_list .txt{
+
+}

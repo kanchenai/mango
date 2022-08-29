@@ -1,5 +1,5 @@
 import Fragment from "@core/frame/view/group/Fragment";
-import html from "@html/fragment/variety_fragment.html";
+import html from "@html/fragment/home/variety_fragment.html";
 import {Adapter, HORIZONTAL} from "@core/frame/view/group/RecycleView";
 import VMargin from "@core/frame/util/VMargin";
 import big_picture_0 from "@images-js/home/recommend_fragment/big_picture_0.png";

@@ -1,5 +1,5 @@
 import Fragment from "@core/frame/view/group/Fragment";
-import html from "@html/fragment/drama_fragment.html"
+import html from "@html/fragment/home/drama_fragment.html"
 
 export default class DramaFragment extends Fragment{
 

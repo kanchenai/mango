@@ -1,5 +1,4 @@
 import Page from "@core/frame/page/Page";
-import html from "@html/list.html"
 
 export default class SearchPage extends Page{
 
@@ -9,7 +8,6 @@ export default class SearchPage extends Page{
     }
 
     onCreate(param){
-        this.html = html;
         console.log(this.pageName,"param",param);
         this.initView();
         this.setView();

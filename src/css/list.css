@@ -1,9 +1,143 @@
-.filter_list{
-
+.bg{
+    background: #141516;
+    width: 1280px;
+    height: 720px;
 }
 
-.filter_list .item,
-.filter_list .focus,
-.filter_list .txt{
+.top{
+    width: 1280px;
+    height: 62px;
+}
 
+.top .logo{
+    left: 24px;
+    top: 30px;
+}
+
+.top .logo img{
+    width: 130px;
+    height: 25px;
+}
+
+.navigation{
+    height: 39px;
+    width: 780px;
+    left: 164px;
+    top:28px;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.navigation .item{
+    width: 66px;
+    height: 39px;
+}
+
+.navigation .focus{
+    width: 60px;
+    height: 24px;
+}
+
+.navigation .focus{
+    border-radius: 7px;
+    /*border: 3px #eb692c solid;*/
+    background: white;
+    top: 3px;
+    left: 3px;
+    border: unset;
+}
+
+.navigation .item .txt{
+    width: 60px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    top: 3px;
+    left: 3px;
+    color: white;
+    text-align: center;
+}
+
+.navigation .item_focus .txt{
+    width: 60px;
+    height: 33px;
+    font-size: 18px;
+    top: 3px;
+    color: #eb692c;
+    text-align: center;
+}
+
+.navigation .item_select .txt{
+    color: #f7d98d;
+}
+
+.navigation .select{
+    width: 12px;
+    height: 2px;
+    background: #f7d98d;
+    top: 31px;
+    left: 27px;
+}
+
+.navigation .item_focus .select,
+.navigation .item .select{
+    display: none;
+}
+
+.navigation .item_select .select{
+    display: block;
+}
+
+.search{
+    width: 216px;
+    height: 30px;
+    left: 1045px;
+    top: 26px;
+}
+
+.search .item,
+.search .bg,
+.search .focus{
+    width: 216px;
+    height: 30px;
+}
+
+.search .bg{
+    background: gray;
+    opacity: 0.6;
+    border-radius: 15px;
+}
+
+.search .focus{
+    left: 0px;
+    top: 0px;
+    background: #ee682a;
+    border-radius: 15px;
+}
+
+.search .icon{
+    top: 9px;
+    left: 15px;
+}
+
+.search .icon img{
+    width: 11px;
+    height: 11px;
+}
+
+.search .txt{
+    width: 166px;
+    height: 30px;
+    left: 29px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 30px;
+}
+
+.frame{
+    width: 1280px;
+    height: 658px;
+    top: 62px;
+    overflow: hidden;
 }

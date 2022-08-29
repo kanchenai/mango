@@ -1,18 +1,25 @@
 <template>
-    <div class="filter_list" view-type="recycle">
-        <div class="item" view-type="item">
-            <div class="focus"></div>
-            <div class="txt"></div>
+    <div class="bg"></div>
+    <div class="top">
+        <div class="logo"><img src="../images/list/vip_logo.png"></div>
+        <div class="navigation"view-type="recycle" view-focus view-id="navigation">
+            <div class="item" view-type="item">
+                <div class="focus"></div>
+                <div class="select"></div>
+                <div class="txt" view-id="txt">精选</div>
+            </div>
+        </div>
+        <div class="search">
+            <div class="item" view-type="item" view-id="search">
+                <div class="bg"></div>
+                <div class="focus"></div>
+                <div class="icon"><img src="../images/home/icon_search.png"></div>
+                <div class="txt" view-type="text" view-id="key">快乐再出发加长加长加长加长加长加长</div>
+            </div>
         </div>
     </div>
 
+    <div class="frame" view-type="frame" view-id="frame"></div>
 
 
-    <div class="content_list" view-type="recycle">
-        <div class="item">
-            <div class="focus"></div>
-            <div class="pic"></div>
-            <div class="txt"></div>
-        </div>
-    </div>
 </template>
