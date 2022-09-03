@@ -46,6 +46,7 @@
 .navigation .focus{
     width: 60px;
     height: 33px;
+    border:none;
 }
 
 .navigation .focus{
@@ -123,6 +124,7 @@
     top: 0px;
     background: #ee682a;
     border-radius: 15px;
+    border: unset;
 }
 
 .search .icon{
@@ -170,6 +172,7 @@
     top: 0px;
     background: #ee682a;
     border-radius: 15px;
+    border: unset;
 }
 
 .content_lib .txt{
@@ -200,6 +203,7 @@
 .delivery .pic{
     left: 0px;
     top: 5px;
+    border: unset;
 }
 
 .delivery .item_focus .pic{

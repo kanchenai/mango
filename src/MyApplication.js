@@ -34,7 +34,7 @@ export default class MyApplication extends Application {
     onLaunch(urlParam) {
         console.log("onLaunch，地址栏参数：", urlParam);
         var firstPage = null;
-        var param = null;
+        var param = urlParam;
         switch (urlParam.pageKey) {
             case "home":
                 firstPage = new HomePage();
@@ -56,6 +56,7 @@ export default class MyApplication extends Application {
     }
 
     onCreate(page, param) {
+        console.log("onCreate，param：", param,"page",page);
         // console.log("MyApplication onCreate");
     }
 

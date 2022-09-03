@@ -31,11 +31,27 @@ export default class ListPage extends Page{
         this.frame.addFragmentList([
             new ListRecommendFragment(this.viewManager),
             new ListVarietyFragment(this.viewManager),
+            new ListRecommendFragment(this.viewManager),
+            new ListVarietyFragment(this.viewManager),
+            new ListRecommendFragment(this.viewManager)
         ])
 
     }
     setView(){}
     initUtils(){}
+
+
+    key_back_event() {
+        let index = this.navigation.childViews.indexOf(this.focusView.fatherView);
+        if(index < 0){
+            this.frame.foregroundView.scrollVerticalTo(0);
+            this.navigation.requestFocus();
+        }else if(index > 0){
+            this.navigation.focusByIndex(0);
+        }else{
+            super.key_back_event();
+        }
+    }
 
 }
 
