@@ -1,11 +1,95 @@
-.filter_list{
+.filter{
     width: 1280px;
-    height: 40px;
-    background: #eb692c;
+    height: 126px;
+    overflow: hidden;
+}
+
+.filter_list{
+    width: 1240px;
+    height: 28px;
+    left: 20px;
 }
 
 .filter_list .item,
 .filter_list .focus,
 .filter_list .txt{
+    width: 65px;
+    height: 28px;
+    border: unset;
+}
 
+.filter_list .focus{
+    border-radius: 33px;
+    background: #eb692c;
+}
+
+.filter_list .txt{
+    font-size: 14px;
+    line-height: 28px;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.filter_list .item_focus .txt{
+    color: white;
+}
+.filter_list .item_select .txt{
+    color: #eb692c;
+}
+
+.line{
+    width: 1240px;
+    height: 1px;
+    left: 20px;
+    top: 126px;
+    background: gray;
+}
+
+.txt{
+    width: 288px;
+    height: 14px;
+    left: 3px;
+    line-height: 14px;
+    font-size: 13px;
+    color: white;
+    white-space: nowrap;
+}
+
+.info{
+    width: 288px;
+    height: 12px;
+    left: 3px;
+    line-height: 12px;
+    font-size: 12px;
+    color: #656566;
+}
+
+.content_list{
+    width: 1248px;
+    height: 658px;
+    left: 16px;
+    top: 143px;
+    overflow: hidden;
+}
+
+.r_300x170 .item {
+    width: 306px;
+    height: 230px;
+}
+
+.r_300x170 .focus,
+.r_300x170 .pic img {
+    width: 300px;
+    height: 170px;
+    border-radius: 0px;
+}
+
+.r_300x170 .txt {
+    top: 180px;
+    overflow: hidden;
+}
+.r_300x170 .info {
+    top: 200px;
 }

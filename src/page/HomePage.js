@@ -119,9 +119,6 @@ export default class HomePage extends Page {
     onDestroy() {
         console.log(this.pageName + "-onDestroy");
     }
-
-    key_back_event() {
-    }
 }
 
 var navigationData = [

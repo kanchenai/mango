@@ -1,18 +1,33 @@
 <template>
-    <div class="filter_list" view-type="recycle">
-        <div class="item" view-type="item">
-            <div class="focus"></div>
-            <div class="txt"></div>
+    <div class="filter" view-type="group" view-id="filter">
+        <div class="filter_list" style="top: 7px;" view-type="recycle" view-id="filter_first">
+            <div class="item" view-type="item">
+                <div class="focus"></div>
+                <div class="txt" view-type="text" view-id="txt"></div>
+            </div>
+        </div>
+
+        <div class="filter_list" style="top: 49px;" view-type="recycle" view-id="filter_second">
+            <div class="item" view-type="item">
+                <div class="focus"></div>
+                <div class="txt" view-type="text" view-id="txt"></div>
+            </div>
+        </div>
+
+        <div class="filter_list" style="top: 90px;" view-type="recycle" view-id="filter_third">
+            <div class="item" view-type="item">
+                <div class="focus"></div>
+                <div class="txt" view-type="text" view-id="txt"></div>
+            </div>
         </div>
     </div>
-
-
-
-    <div class="content_list" view-type="recycle">
-        <div class="item">
+    <div class="line"></div>
+    <div class="r_300x170 content_list" view-type="recycle" view-id="content_list">
+        <div class="item" view-type="item">
             <div class="focus"></div>
-            <div class="pic"></div>
-            <div class="txt"></div>
+            <div class="pic"><img view-id="pic"></div>
+            <div class="txt" view-type="text" view-id="txt"></div>
+            <div class="info" view-id="info"></div>
         </div>
     </div>
 
