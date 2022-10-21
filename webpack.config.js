@@ -6,7 +6,7 @@ module.exports = {
     entry: './src/main',
     output: {
         filename: "view_app.js",
-        path: path.resolve(__dirname, './dist')
+        path: path.resolve(__dirname, './dist'),
     },
     module: {
         rules: [
@@ -92,7 +92,8 @@ module.exports = {
         modules: [path.resolve(__dirname, "./core/loader"), 'node_modules']
     },
     // devServer: {//一般使用默认
-    // }
+    // },
     //使用source-map直接调试es6代码
     devtool: 'source-map',
+    stats: "none",
 }

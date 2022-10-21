@@ -18,7 +18,7 @@ export default class MyApplication extends Application {
                     page = new HomePage();
                     break;
                 case "DetailPage":
-                    page = new HomePage();
+                    page = new DetailPage();
                     break;
                 case "ListPage":
                     page = new ListPage();
