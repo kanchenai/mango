@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: './src/main',
     output: {
-        filename: "view_app.js",
+        filename: "[name].js",
         path: path.resolve(__dirname, './dist'),
     },
     module: {
@@ -32,7 +32,7 @@ module.exports = {
             {
                 test: [/\.html$/],
                 include: path.resolve(__dirname, 'src/html/'),
-                use: ["html-loader", "view-html-loader"],
+                use: ["html-withimg-loader", "view-html-loader"],//html-withimg-loader,图片使用url-loader另行打包
             },
             // {
             //     test: [/\.html$/],
@@ -45,11 +45,30 @@ module.exports = {
                 use: {
                     loader: "file-loader",
                     options: {
-                        name: "[contenthash:8].[ext]",
+                        name: "static/[path][name].[ext]",
                         output: "imgs",
+                        context: path.resolve(__dirname, './src'),//过滤掉[path]的相对路径
                     }
                 },
+            },
+            {
+                test: [/\.png$/, /\.jpg$/, /\.jpeg$/, /\.gif$/],//使用地址引入的图片，使用这个打包
+                exclude: path.resolve(__dirname, 'src/images-js/'),
+                use: [{
+                    loader: 'url-loader',
+                    options: {
+                        limit: 5000,
+                        name: 'static/[path][name]_[contenthash:8].[ext]',
+                        context: path.resolve(__dirname, './src'),//过滤掉[path]的相对路径
+                        publicPath:'./',
+                        esModule: false
+                    }
+
+                }]
+
             }
+
+
         ],
         // noParse: /jquery/
     },
@@ -95,5 +114,5 @@ module.exports = {
     // },
     //使用source-map直接调试es6代码
     devtool: 'source-map',
-    stats: "none",
+    stats: "errors-only",
 }
