@@ -1,0 +1,111 @@
+.bg{
+    background: #141516;
+    width: 1280px;
+    height: 720px;
+}
+.key_word {
+    width: 385px;
+    height: 60px;
+    left: 32px;
+    top: 60px;
+    background: gray;
+}
+
+.key_word .txt{
+    width: 365px;
+    height: 60px;
+    left: 10px;
+    line-height: 60px;
+    font-size: 28px;
+    text-align: left;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.keyboard {
+    width: 400px;
+    height: 400px;
+    left: 32px;
+    top: 130px;
+    overflow: hidden;
+}
+
+.keyboard .item,
+.keyboard .focus,
+.keyboard .txt {
+    width: 60px;
+    height: 60px;
+}
+
+.keyboard .txt {
+    font-size: 24px;
+    line-height: 60px;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.keyboard .item {
+    background: gray;
+}
+
+.keyboard .item_focus {
+    border: 0px;
+    background: #eb692c;
+}
+
+.keyboard .txt {
+    font-size: 24px;
+    line-height: 60px;
+    text-align: center;
+    color: white;
+}
+
+.button {
+    left: 32px;
+    top: 530px;
+}
+
+.button .item {
+    width: 190px;
+    height: 40px;
+    font-size: 24px;
+    line-height: 40px;
+    color: white;
+    background: gray;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.button .item_focus {
+    border: 0px;
+    background: #eb692c;
+}
+
+.line{
+    width: 1px;
+    height: 720px;
+    background: gray;
+}
+
+
+.title{
+    width: 300px;
+    height: 31px;
+    top: 60px;
+}
+
+.title .txt{
+    height: 31px;
+    white-space: nowrap;
+    line-height: 31px;
+    font-size: 20px;
+}
+
+
+.poster_list {
+    width: 400px;
+    height: 720px;
+    overflow: hidden;
+}

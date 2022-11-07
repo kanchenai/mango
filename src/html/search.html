@@ -1,0 +1,42 @@
+<template>
+    <div class="bg"></div>
+    <div class="key_word">
+        <div class="txt" view-type="text" view-id="keyword"></div>
+    </div>
+
+    <div class="keyboard" style="" view-type="recycle" view-id="keyboard" view-focus>
+        <div class="item" view-type="item">
+            <div class="txt" view-id="txt">A</div>
+        </div>
+    </div>
+
+    <div class="button">
+        <div class="item" view-type="item">删除</div>
+        <div class="item" style="left: 195px;" view-type="item">清空</div>
+    </div>
+    <div class="line" style="left: 450px;"></div>
+    <div class="title" style="left: 475px;">
+        <div class="txt">搜索推荐</div>
+    </div>
+    <div class="poster_list" style="left: 450px;" view-type="recycle" view-down="up" view-id="search_recommend">
+        <div class="item" view-type="item">
+            <div class="focus"></div>
+            <div class="pic"><img view-id="pic" alt=""></div>
+            <div class="txt" view-type="text" view-id="txt">文d字</div>
+        </div>
+    </div>
+
+    <div class="line" style="left: 880px;"></div>
+
+    <div class="title" style="left: 905px;">
+        <div class="txt">搜索结果</div>
+    </div>
+    <div class="poster_list" style="left: 880px;" view-type="recycle" view-down="none" view-id="search_result">
+        <div class="item" view-type="item">
+            <div class="focus"></div>
+            <div class="pic"><img view-id="pic" alt=""></div>
+            <div class="txt" view-type="text" view-id="txt">文d字</div>
+        </div>
+    </div>
+
+</template>
