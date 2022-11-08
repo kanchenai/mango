@@ -10,19 +10,19 @@
         </div>
     </div>
 
-    <div class="button">
-        <div class="item" view-type="item">删除</div>
-        <div class="item" style="left: 195px;" view-type="item">清空</div>
+    <div class="button" view-type="group">
+        <div class="item" view-type="item" view-id="button_delete">删除</div>
+        <div class="item" style="left: 195px;" view-type="item" view-id="button_clear">清空</div>
     </div>
     <div class="line" style="left: 450px;"></div>
     <div class="title" style="left: 475px;">
         <div class="txt">搜索推荐</div>
     </div>
-    <div class="poster_list" style="left: 450px;" view-type="recycle" view-down="up" view-id="search_recommend">
+    <div class="poster_list" style="left: 490px;" view-type="recycle" view-id="search_recommend" view-click="onPosterClickListener">
         <div class="item" view-type="item">
             <div class="focus"></div>
             <div class="pic"><img view-id="pic" alt=""></div>
-            <div class="txt" view-type="text" view-id="txt">文d字</div>
+            <div class="txt" view-type="text" view-id="txt"></div>
         </div>
     </div>
 
@@ -31,11 +31,11 @@
     <div class="title" style="left: 905px;">
         <div class="txt">搜索结果</div>
     </div>
-    <div class="poster_list" style="left: 880px;" view-type="recycle" view-down="none" view-id="search_result">
+    <div class="poster_list" style="left: 905px;width: 375px;" view-type="recycle" view-down="none" view-id="search_result" view-click="onPosterClickListener">
         <div class="item" view-type="item">
             <div class="focus"></div>
             <div class="pic"><img view-id="pic" alt=""></div>
-            <div class="txt" view-type="text" view-id="txt">文d字</div>
+            <div class="txt" view-type="text" view-id="txt"></div>
         </div>
     </div>
 

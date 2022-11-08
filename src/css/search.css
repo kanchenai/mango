@@ -15,12 +15,10 @@
     width: 365px;
     height: 60px;
     left: 10px;
-    line-height: 60px;
     font-size: 28px;
     text-align: left;
     color: white;
     white-space: nowrap;
-    overflow: hidden;
 }
 
 .keyboard {
@@ -65,6 +63,8 @@
 .button {
     left: 32px;
     top: 530px;
+    width: 400px;
+    height: 40px;
 }
 
 .button .item {
@@ -106,6 +106,31 @@
 
 .poster_list {
     width: 400px;
-    height: 720px;
+    height: 620px;
+    top: 100px;
     overflow: hidden;
+}
+
+.poster_list .item{
+    width: 171px;
+    height: 246px;
+}
+
+.poster_list .focus,
+.poster_list img{
+    width: 165px;
+    height: 240px;
+}
+
+.poster_list .txt{
+    width: 171px;
+    height: 14px;
+    left: 3px;
+    top: 260px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 14px;
+    font-size: 13px;
+    color: white;
 }
