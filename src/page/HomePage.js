@@ -22,6 +22,7 @@ import FashionFragment from "@fragment/home/FashionFragment";
 import LiveFragment from "@fragment/home/LiveFragment";
 import ListPage from "@page/ListPage";
 import SearchPage from "@page/SearchPage";
+import ConfirmDialog from "@src/dialog/ConfirmDialog";
 
 export default class HomePage extends Page {
     constructor() {
@@ -66,6 +67,8 @@ export default class HomePage extends Page {
             new FashionFragment(this.viewManager),
             new LiveFragment(this.viewManager)
         ])
+
+        this.dialog = new ConfirmDialog(this.viewManager);
 
     }
 
@@ -118,6 +121,10 @@ export default class HomePage extends Page {
 
     onDestroy() {
         console.log(this.pageName + "-onDestroy");
+    }
+
+    key_back_event() {
+        this.dialog.show();
     }
 }
 
