@@ -42,6 +42,9 @@ import watch_too_11 from "@images-js/detail/watch_too_11.png";
 import watch_too_12 from "@images-js/detail/watch_too_12.png";
 import watch_too_13 from "@images-js/detail/watch_too_13.png";
 import watch_too_14 from "@images-js/detail/watch_too_14.png";
+import VideoPlayer from "@core/frame/player/VideoPlayer";
+import PlayInfo from "@core/frame/player/PlayInfo";
+import utils from "@src/util/utils";
 
 export default class DetailPage extends Page {
     constructor() {
@@ -58,6 +61,9 @@ export default class DetailPage extends Page {
     }
 
     initView() {
+        this.video_pic = this.findViewById("video_pic");
+        this.bg = this.findViewById("bg");
+
         this.highlight = this.findViewById("highlight");
         this.highlight.orientation = HORIZONTAL;
         this.highlight.adapter = new HighlightAdapter();
@@ -83,15 +89,73 @@ export default class DetailPage extends Page {
         this.watch_too.margin.bottom = 9;
         this.watch_too.adapter = new WatchTooAdapter();
         this.watch_too.data = watchTooData;
+
+        this.player = new VideoPlayer(this);
+
+        var playUrl = "http://live.ynurl.com/video/s10027-LCDST/index.m3u8"
+        var playInfo = new PlayInfo(playUrl, 19, 19, 767, 420);
+        this.player.play(0, playInfo);
     }
 
     setView() {
-
+        this.player.onPlayStart = "onPlayStart";
+        this.player.onPositionChangeListener = "onPositionChangeListener";
+        this.player.onVolumeChangeListener = "onVolumeChangeListener";
+        this.player.onPlayComplete = "onPlayComplete";
+        this.player.onPlayPause = "onPlayPause";
+        this.player.onPlayResume = "onPlayResume";
+        this.player.onPlayStop = "onPlayStop";
+        this.player.onPlayError = "onPlayError";
+        this.player.onPlayByTime = "onPlayByTime";
     }
 
     initUtils() {
         this.highlightPlayingIndex = 0;
         this.subsetPlayingIndex = 2;
+    }
+
+    onPlayStart() {
+        console.log(this.pageName + " onPlayStart");
+        this.video_pic.hide();
+        utils.bgToVideoBg(this.bg.ele.parentNode,this.bg.ele,this.player.playInfo);
+    }
+
+    onPlayPause() {
+        console.log(this.pageName + " onPlayPause");
+        this.video_pic.show();
+        utils.videoBgToBg(this.bg.ele.parentNode,this.bg.ele)
+    }
+
+    onPlayResume() {
+        console.log(this.pageName + " onPlayResume");
+        this.video_pic.hide();
+        utils.bgToVideoBg(this.bg.ele.parentNode,this.bg.ele,this.player.playInfo);
+    }
+
+    onPositionChangeListener(position, duration) {
+        // console.log(this.pageName + " position",position,"duration",duration);
+    }
+
+    onVolumeChangeListener(volume) {
+        console.log(this.pageName + " volume", volume);
+    }
+
+    onPlayStop() {
+        console.log(this.pageName + " onPlayStop");
+        this.video_pic.show();
+        utils.videoBgToBg(this.bg.ele.parentNode,this.bg.ele)
+    }
+
+    onPlayComplete() {
+        console.log(this.pageName + " onPlayComplete");
+    }
+
+    onPlayError() {
+        console.log(this.pageName + " onPlayError");
+    }
+
+    onPlayByTime(time) {
+        console.log(this.pageName + " onPlayByTime", time);
     }
 }
 
@@ -219,17 +283,17 @@ var sameTypeData = [
     {
         pic: same_type_0,
         name: "向往的生活",
-        info:"《向往的生活》是由湖南卫视制作"
+        info: "《向往的生活》是由湖南卫视制作"
     },
     {
         pic: same_type_1,
         name: "向往的生活 第二季",
-        info:"《向往的生活》是由湖南卫视制作"
+        info: "《向往的生活》是由湖南卫视制作"
     },
     {
         pic: same_type_2,
         name: "向往的生活 第三季",
-        info:"《向往的生活》是由湖南卫视制作"
+        info: "《向往的生活》是由湖南卫视制作"
     },
 ];
 
@@ -237,77 +301,77 @@ var watchTooData = [
     {
         pic: watch_too_0,
         name: "Plus第11期：同花顺反转不断",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_1,
         name: "Plus第10期：艺兴彭彭承包早餐",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_2,
         name: "Plus第12期：黄磊套路龚俊出海",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_3,
         name: "第2期：歌剧诡影（下）",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_4,
         name: "第2期：古宅惊魂（上）",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_5,
         name: "Plus第7期：隐形组\"极挑局\"",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_6,
         name: "老友记：李荣浩音乐会",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_7,
         name: "慢直播第7期：彭彭剖鱼",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_8,
         name: "Plus第6期：张艺兴教跳狂派舞",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_9,
         name: "第7期：李雪琴演绎烫嘴绕口令",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_10,
         name: "第8期：张艺兴翻窗练舞",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_11,
         name: "第13期：黄磊艺兴\"反目成仇\"",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_12,
         name: "Plus第1期：三兄妹寻神秘树屋",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_13,
         name: "第5期：天使学园（上）",
-        info:"海量次播放"
+        info: "海量次播放"
     },
     {
         pic: watch_too_14,
         name: "第9期：黄磊灵魂拷问张艺兴",
-        info:"海量次播放"
+        info: "海量次播放"
     },
 ];
 
@@ -323,9 +387,9 @@ class HighlightAdapter extends Adapter {
 
         let totalLen = holder.recycleView.data.length
         var index = (holder.index + totalLen) % totalLen;
-        if(index == this.recycleView.page.highlightPlayingIndex){
+        if (index == this.recycleView.page.highlightPlayingIndex) {
             holder.findEleById("playing").style.display = "block";
-        }else{
+        } else {
             holder.findEleById("playing").style.display = "none";
         }
     }
@@ -341,9 +405,9 @@ class SubsetAdapter extends Adapter {
 
         let totalLen = holder.recycleView.data.length
         var index = (holder.index + totalLen) % totalLen;
-        if(index == this.recycleView.page.subsetPlayingIndex){
+        if (index == this.recycleView.page.subsetPlayingIndex) {
             holder.findEleById("playing").style.display = "block";
-        }else{
+        } else {
             holder.findEleById("playing").style.display = "none";
         }
     }

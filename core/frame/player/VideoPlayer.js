@@ -1,42 +1,51 @@
+import Page from "@core/frame/page/Page";
+import IptvPlayer from "@core/frame/player/IptvPlayer";
+import PlayInfo from "@core/frame/player/PlayInfo";
+
 /**
- * 在子类中必需要重写的方法,具体的写法在各个方法中都有注释，
- * 以下方法需要重写：
- * 1.play
- * 2.playByTime
- * 3.pause
- * 4.resume
- * 5.stop
- * 6.destroy
- * 7.mute
- * 8.get realPosition
- * 9.get realDuration
- * 10.set realVolume
- *
- * 按需重写的方法有：
- * 1.startRefreshPlayerState
- *
+ * 当切换播放器时（页面跳转或Fragment切换），需要先暂停或停止，然后在进行切换播放器（页面跳转或Fragment切换）
+ * 不然会同时触发多个相同的监听（如：onPositionChangeListener）
  */
 export default class VideoPlayer {
-    constructor() {
-        this.page = null;
+    constructor(listenerLocation) {
+        this.listenerLocation = listenerLocation;
+        if (this.listenerLocation instanceof Page) {
+            this.page = listenerLocation;
+        } else {
+            this.page = listenerLocation.page;
+        }
 
-        //当前音量
-        this._volume = 0;
+        this.player = this.page.application.player;
+
+        var player = this;
+        if (this.player instanceof IptvPlayer) {
+            this.page.key_player_event = function (eventJson) {
+                key_player_event(player, eventJson);
+            }
+        }
+
+        //音量增减
+        this.page.key_volUp_event = function () {
+            player.volumeUp();
+        };
+
+        this.page.key_volDown_event = function () {
+            player.volumeDown();
+        };
+        this.page.key_mute_event = function () {
+            player.mute();
+        };
+
         //每次音量调节幅度
         this.volumeCell = 5;
-        this.isMute = false;
+        this._isMute = false;
         //播放状态
-        this.isPlaying = false;
-
+        this._isPlaying = false;
         /**
          * 播放信息
          * @type {PlayInfo}
          */
         this.playInfo = new PlayInfo();
-        //视频总时长
-        this._duration = 0;
-        //视频当前进度
-        this._currentPosition = 0;
         //定时刷新播放状态的timer
         this.timer = null;
         //延迟调用播放结束监听的timer,一般在播放结束无法正常触发，通过进度方式主动触发的，并避免小概率事件
@@ -47,6 +56,8 @@ export default class VideoPlayer {
         this.isOnComplete = false;
         //盒子型号
         this.stbType = "";
+        //书签位置，在暂停时记录
+        this.bookmark = -1;
 
         /**
          * 播放进度变化监听
@@ -90,11 +101,11 @@ export default class VideoPlayer {
     }
 
     /**
-     * 需要重写，并在方法头部调用super.play方法
-     * @param startTime
-     * @param playInfo
+     * @param{number} startTime
+     * @param{PlayInfo} playInfo
      */
     play(startTime, playInfo) {
+        this.bookmark = -1;
         //触发播放开始
         this.isOnStart = false;
         //触发播放结束
@@ -105,64 +116,74 @@ export default class VideoPlayer {
         if (playInfo) {
             this.playInfo = playInfo;
         }
-        //需要被重写，并调用父类方法，调用之后，补充对应播放器的实际功能
-        //在子类中续写实际播放功能，然后调用this.startRefreshPlayerState()方法
-        //this.startRefreshPlayerState();//开始刷新播放转台
+        this.player.play(startTime, playInfo);
+        this._isPlaying = true;
+        this._isMute = this.player.isMute;
+
+        this.player.playInfo = playInfo;//暂存，用以暂停继续
+
+        this.startRefreshPlayerState();//开始刷新播放转台
     }
 
     replay() {
         this.play(0);
     }
 
-    /**
-     * 需要重写，并在方法结尾调用super.playByTime方法
-     * @param time
-     */
     playByTime(time) {
-        if(!this.isPlaying){
+        if (!this.isPlaying) {
             this.resume();
         }
+        this.player.playByTime(time);
         if (this.completeTimer) {
             clearTimeout(this.completeTimer);//取消触发播放结束
         }
         this.callPlayByTime(time);
     }
 
-    /**
-     * 需要重写，并在方法结尾调用super.pause方法
-     */
     pause() {
-        this.isPlaying = false;
+        this.player.pause();
+        this.bookmark = this.currentPosition;
+        this._isPlaying = false;
         if (this.completeTimer) {
             clearTimeout(this.completeTimer);//取消触发播放结束
         }
+
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
         this.callPlayPause();
     }
 
-    /**
-     * 需要重写，并在方法结尾调用super.resume方法
-     */
     resume() {
-        this.isPlaying = true;
+        if (this.player.playInfo != this.playInfo) {//playInfo发生变化,播放信息改变了,需要根据书签播放
+            console.log("使用书签resume",this.bookmark);
+            this.play(this.bookmark, this.playInfo);
+            this.isOnStart = true;//不触发播放开始
+        } else {//未切换，只是暂停
+            this.player.resume();
+            this._isPlaying = true;
+            this.bookmark = -1;
+        }
+
         this.callPlayResume();
     }
 
-    /**
-     * 需要重写，并在方法结尾调用super.stop方法
-     */
     stop() {
-        this.isPlaying = false;
+        this.player.stop();
+        this._isPlaying = false;
         if (this.completeTimer) {
             clearTimeout(this.completeTimer);//取消触发播放结束
         }
+
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
         this.callPlayStop();
     }
 
-    /**
-     * 需要重写，并在方法结尾调用super.destroy方法
-     */
     destroy() {
-        this.isPlaying = false;
         if (this.completeTimer) {
             clearTimeout(this.completeTimer);//取消触发播放结束
         }
@@ -170,6 +191,8 @@ export default class VideoPlayer {
         if (this.timer) {
             clearTimeout(this.timer);//取消触发播放结束
         }
+        this.player.destroy();
+        this._isPlaying = false;
     }
 
     volumeUp() {
@@ -180,42 +203,26 @@ export default class VideoPlayer {
         this.volume -= this.volumeCell;
     }
 
-    /**
-     * 需要重写，并在方法结尾调用super.mute方法
-     */
     mute() {
-        this.isMute = !this.isMute;
+        this.player.mute();
 
         if (this.isMute) {
             this.callVolumeChangeListener(-1);
-        }else{
+        } else {
             this.callVolumeChangeListener(this.volume);
         }
     }
 
-    /**
-     * 在子类中重写
-     * @returns {number}
-     */
     get realPosition() {
-        console.error("realPosition未在子类中实现");
-        return 0;
+        return this.player.position;
     }
 
-    /**
-     * 在子类中重写
-     * @returns {number}
-     */
     get realDuration() {
-        console.error("realDuration未在子类中实现");
-        return 0;
+        return this.player.duration;
     }
 
-    /**
-     * 在子类中重写
-     */
-    set realVolume(value){
-        console.error("set realVolume未在子类中实现")
+    set realVolume(value) {
+        this.player.volume = value;
     }
 
     /**
@@ -269,16 +276,14 @@ export default class VideoPlayer {
         var onPositionChangeListener = null;
         if (this.onPositionChangeListener) {
             if (typeof this.onPositionChangeListener == "string") {
-                if (this.page) {
-                    onPositionChangeListener = this.page[this.onPositionChangeListener];
-                }
+                onPositionChangeListener = this.listenerLocation[this.onPositionChangeListener];
             } else if (this.onPositionChangeListener instanceof Function) {
                 onPositionChangeListener = this.onPositionChangeListener;
             } else {
                 console.error("播放进度变化监听设置错误");
                 return;
             }
-            onPositionChangeListener.call(this.page, position, duration);
+            onPositionChangeListener.call(this.listenerLocation, position, duration);
         }
     }
 
@@ -286,16 +291,14 @@ export default class VideoPlayer {
         var onVolumeChangeListener = null;
         if (this.onVolumeChangeListener) {
             if (typeof this.onVolumeChangeListener == "string") {
-                if (this.page) {
-                    onVolumeChangeListener = this.page[this.onVolumeChangeListener];
-                }
+                onVolumeChangeListener = this.listenerLocation[this.onVolumeChangeListener];
             } else if (this.onVolumeChangeListener instanceof Function) {
                 onVolumeChangeListener = this.onVolumeChangeListener;
             } else {
                 console.error("音量变化监听设置错误");
                 return;
             }
-            onVolumeChangeListener.call(this.page, volume);
+            onVolumeChangeListener.call(this.listenerLocation, volume);
         }
     }
 
@@ -308,16 +311,14 @@ export default class VideoPlayer {
         var onPlayStart = null;
         if (this.onPlayStart) {
             if (typeof this.onPlayStart == "string") {
-                if (this.page) {
-                    onPlayStart = this.page[this.onPlayStart];
-                }
+                onPlayStart = this.listenerLocation[this.onPlayStart];
             } else if (this.onPlayStart instanceof Function) {
                 onPlayStart = this.onPlayStart;
             } else {
                 console.error("播放开始监听设置错误");
                 return;
             }
-            onPlayStart.call(this.page);
+            onPlayStart.call(this.listenerLocation);
         }
     }
 
@@ -329,16 +330,14 @@ export default class VideoPlayer {
         var onPlayComplete = null;
         if (this.onPlayComplete) {
             if (typeof this.onPlayComplete == "string") {
-                if (this.page) {
-                    onPlayComplete = this.page[this.onPlayComplete];
-                }
+                onPlayComplete = this.listenerLocation[this.onPlayComplete];
             } else if (this.onPlayComplete instanceof Function) {
                 onPlayComplete = this.onPlayComplete;
             } else {
                 console.error("播放结束监听设置错误");
                 return;
             }
-            onPlayComplete.call(this.page);
+            onPlayComplete.call(this.listenerLocation);
         }
     }
 
@@ -346,16 +345,14 @@ export default class VideoPlayer {
         var onPlayPause = null;
         if (this.onPlayPause) {
             if (typeof this.onPlayPause == "string") {
-                if (this.page) {
-                    onPlayPause = this.page[this.onPlayPause];
-                }
+                onPlayPause = this.listenerLocation[this.onPlayPause];
             } else if (this.onPlayPause instanceof Function) {
                 onPlayPause = this.onPlayPause;
             } else {
                 console.error("播放暂停监听设置错误");
                 return;
             }
-            onPlayPause.call(this.page);
+            onPlayPause.call(this.listenerLocation);
         }
     }
 
@@ -363,16 +360,14 @@ export default class VideoPlayer {
         var onPlayResume = null;
         if (this.onPlayResume) {
             if (typeof this.onPlayResume == "string") {
-                if (this.page) {
-                    onPlayResume = this.page[this.onPlayResume];
-                }
+                onPlayResume = this.listenerLocation[this.onPlayResume];
             } else if (this.onPlayResume instanceof Function) {
                 onPlayResume = this.onPlayResume;
             } else {
                 console.error("播放继续监听设置错误");
                 return;
             }
-            onPlayResume.call(this.page);
+            onPlayResume.call(this.listenerLocation);
         }
     }
 
@@ -380,16 +375,14 @@ export default class VideoPlayer {
         var onPlayStop = null;
         if (this.onPlayStop) {
             if (typeof this.onPlayStop == "string") {
-                if (this.page) {
-                    onPlayStop = this.page[this.onPlayStop];
-                }
+                onPlayStop = this.listenerLocation[this.onPlayStop];
             } else if (this.onPlayStop instanceof Function) {
                 onPlayStop = this.onPlayStop;
             } else {
                 console.error("播放停止监听设置错误");
                 return;
             }
-            onPlayStop.call(this.page);
+            onPlayStop.call(this.listenerLocation);
         }
     }
 
@@ -397,16 +390,14 @@ export default class VideoPlayer {
         var onPlayError = null;
         if (this.onPlayError) {
             if (typeof this.onPlayError == "string") {
-                if (this.page) {
-                    onPlayError = this.page[this.onPlayError];
-                }
+                onPlayError = this.listenerLocation[this.onPlayError];
             } else if (this.onPlayError instanceof Function) {
                 onPlayError = this.onPlayError;
             } else {
                 console.error("播放异常监听设置错误");
                 return;
             }
-            onPlayError.call(this.page);
+            onPlayError.call(this.listenerLocation);
         }
     }
 
@@ -414,16 +405,14 @@ export default class VideoPlayer {
         var onPlayByTime = null;
         if (this.onPlayByTime) {
             if (typeof this.onPlayByTime == "string") {
-                if (this.page) {
-                    onPlayByTime = this.page[this.onPlayByTime];
-                }
+                onPlayByTime = this.listenerLocation[this.onPlayByTime];
             } else if (this.onPlayByTime instanceof Function) {
                 onPlayByTime = this.onPlayByTime;
             } else {
                 console.error("调整播放进度监听设置错误");
                 return;
             }
-            onPlayByTime.call(this.page, position);
+            onPlayByTime.call(this.listenerLocation, position);
         }
     }
 
@@ -439,7 +428,7 @@ export default class VideoPlayer {
         return this._duration;
     }
 
-    set duration(value){
+    set duration(value) {
         this._duration = value;
     }
 
@@ -451,26 +440,51 @@ export default class VideoPlayer {
         if (value < 0) {
             value = 0;
         }
-        this._volume = value;
         this.realVolume = value;//实际设置
-        this.callVolumeChangeListener(this._volume);
+        this.callVolumeChangeListener(value);
     }
 
     get volume() {
-        return this._volume;
+        return this.player.volume;
+    }
+
+    get isMute() {
+        return this._isMute;
+    }
+
+    get isPlaying() {
+        return this._isPlaying;
     }
 }
 
 /**
- * 按需继承
+ *
+ * @param{VideoPlayer} player
+ * @param{String} eventJson
  */
-export class PlayInfo {
-    constructor(playUrl, left, top, width, height) {
-        this.playUrl = playUrl || "";
-        this.left = left || 0;
-        this.top = top || 0;
-        this.width = width || 0;
-        this.height = height || 0;
+var key_player_event = function (player, eventJson) {
+    var typeStr = eventJson.type;
+    switch (typeStr) {
+        case "EVENT_TVMS":
+        case "EVENT_TVMS_ERROR":
+            return;
+        case "EVENT_MEDIA_ERROR":
+            player.callPlayError();
+            return;
+        case "EVENT_MEDIA_END":
+            player.callPlayComplete();
+            return;
+        case "EVENT_PLTVMODE_CHANGE":
+            return;
+        case "EVENT_PLAYMODE_CHANGE":
+            //播放模式改变，在switch外处理
+            break;
+        case "EVENT_MEDIA_BEGINING":
+            player.callPlayStart();
+            return;
+        case "EVENT_GO_CHANNEL":
+            return;
+        default:
+            break;
     }
-
-}
+};

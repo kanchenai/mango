@@ -1,10 +1,10 @@
 import Application from "../core/frame/app/Application";
 import HomePage from "./page/HomePage";
 import IptvPlayer from "@core/frame/player/IptvPlayer";
-import WebPlayer from "@src/util/WebPlayer";
 import DetailPage from "@page/DetailPage";
 import ListPage from "@page/ListPage";
 import SearchPage from "@page/SearchPage";
+import AliWebPlayer from "@src/util/AliWebPlayer";
 
 require('./global_style.css')
 
@@ -49,7 +49,7 @@ export default class MyApplication extends Application {
                 firstPage = new SearchPage();
                 break;
             default:
-                firstPage = new HomePage();
+                firstPage = new DetailPage();
                 break;
         }
         return {firstPage, param};
@@ -80,12 +80,12 @@ export default class MyApplication extends Application {
     }
 
     getPlayerInstance() {
-        var player = {};
-        try{
-            player = new IptvPlayer(this.keyboard);
-        }catch (e){
-            player = new WebPlayer();
-        }
-        return player;
+        // var player = {};
+        // try{
+        //     player = new IptvPlayer(this.keyboard);
+        // }catch (e){
+        //     player = new AliWebPlayer();
+        // }
+        return new AliWebPlayer();
     }
 }

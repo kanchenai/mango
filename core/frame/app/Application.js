@@ -11,7 +11,7 @@ require("../../css/style.css");
  * view-app的版本号
  * @type {string}
  */
-export var version = "0.2.3(2022-11-08)";
+export var version = "0.2.4(2022-11-15)";
 
 export default class Application extends GroupView {
     constructor(id) {
@@ -140,8 +140,6 @@ export default class Application extends GroupView {
             this.foregroundPage.pause();
         }
         this.foregroundPage = page;
-        this.keyboard.page = null;//保护，防止异常触发按键
-        this.player.page = null;//保护，防止异常触发
 
         if (param) {
             param = param.clone();//避免移除ViewManager中的pageInfoList异常
@@ -151,8 +149,6 @@ export default class Application extends GroupView {
         page.create(param);
         page.resume();
         this.measure();
-        this.keyboard.page = page;
-        this.player.page = page;
         page.isForeground = true;
 
         // console.log(this.pageList);
@@ -215,8 +211,6 @@ export default class Application extends GroupView {
         if (backResultData) {
             page.onResult(backResultData);//将返回数据传递到上一个一个页面
         }
-        this.keyboard.page = page;
-        this.player.page = page;
     }
 
     /**

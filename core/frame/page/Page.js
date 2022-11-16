@@ -4,7 +4,8 @@ import GroupView from "../view/group/GroupView";
 
 export default class Page extends GroupView {
     constructor() {
-        super(null,null);
+        super(null, null);
+
         this.listenerLocation = this;
         this.focusable = false;
         delete this.data;
@@ -28,6 +29,7 @@ export default class Page extends GroupView {
         this.param = param || {};
         this.pageManager.putPageInfo(this, param);//保存数据，到本地,与在页面中主动保存参数信息不同
         this.lifeState = State.LifeState.CREATE;//当前生命周期处在Page创建
+        this.application.keyboard.page = this;
         this.onCreate(param);//Page回调-创建
     }
 
@@ -39,10 +41,11 @@ export default class Page extends GroupView {
 
         var page = this;
         setTimeout(function () {
-            page.loadImageResource();
+            page.loadImageResource(true);
         }, 50);
 
         this.lifeState = State.LifeState.RUN;//当前生命周期处在Page运行
+        this.application.keyboard.page = page;
         this.onResume();//Page回调-继续
     }
 
@@ -51,6 +54,7 @@ export default class Page extends GroupView {
         this.isForeground = false;//设置当前Page前台状态改为false，标识当前Page不在前台
         this.hide();//隐藏，TODO 这里可以对应不同的动画
         this.onPause();//Page回调-暂停
+        this.application.keyboard.page = null;//保护，防止异常触发按键
     }
 
     stop() {
@@ -190,7 +194,7 @@ export default class Page extends GroupView {
      * 去除调用application的callFocusChangeListener调用
      */
     callFocusChangeListener(view, hasFocus, intercept) {
-        if(intercept){
+        if (intercept) {
             return;
         }
         if (this.onFocusChangeListener && typeof this.onFocusChangeListener == "string") {
@@ -344,6 +348,13 @@ export default class Page extends GroupView {
     };
 
     key_blue_event() {
+    };
+
+    /**
+     * 播放事件,
+     * @param player_event 播放的具体信息
+     */
+    key_player_event(player_event) {
     };
 
     //其他
