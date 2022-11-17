@@ -114,6 +114,10 @@ export default class DetailPage extends Page {
         this.subsetPlayingIndex = 2;
     }
 
+    onPause() {
+        this.player.pause();
+    }
+
     onPlayStart() {
         console.log(this.pageName + " onPlayStart");
         this.video_pic.hide();

@@ -49,7 +49,7 @@ export default class MyApplication extends Application {
                 firstPage = new SearchPage();
                 break;
             default:
-                firstPage = new DetailPage();
+                firstPage = new HomePage();
                 break;
         }
         return {firstPage, param};
@@ -67,6 +67,10 @@ export default class MyApplication extends Application {
     onDestroy() {
         // console.log("MyApplication onDestroy")
         // 如果是app+epg，在这里（或exitUrl()）调用退出app的方法
+        if(this.player){
+            this.player.destroy();
+        }
+
     }
 
     exitUrl() {
