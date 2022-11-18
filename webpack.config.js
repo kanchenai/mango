@@ -24,10 +24,10 @@ module.exports = {
             },
             {
                 //匹配js，使用babel-loader进行代码转化
-                // test:/\.js$/,
-                // use:{
-                //     loader: "babel-loader"
-                // }
+                test:/\.js$/,
+                use:{
+                    loader: "babel-loader"
+                }
             },
             {
                 test: [/\.html$/],
@@ -100,7 +100,7 @@ module.exports = {
         })
     ],
     mode: "development",//运行环境：开发环境
-    // mode: "production",//运行环境：生产环境
+    mode: "production",//运行环境：生产环境
 
     performance: {
         hints: 'error',//提示等级
@@ -114,5 +114,6 @@ module.exports = {
     // },
     //使用source-map直接调试es6代码
     devtool: 'source-map',
+    // devtool: false,//打包时，解注释这行
     stats: "errors-only",
 }
