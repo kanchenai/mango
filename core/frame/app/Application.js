@@ -4,14 +4,16 @@ import PageManager from "@core/frame/page/PageManager";
 import {Scroller} from "@core/frame/view/base/ScrollView";
 import View from "@core/frame/view/base/View";
 import {PageLifeState} from "@core/frame/page/Page";
+import "@core/frame/view/css"
 
 require("../../css/style.css");
+
 
 /**
  * view-app的版本号
  * @type {string}
  */
-export var version = "0.2.4(2022-11-17)";
+export var version = "0.3.1(2023-01-12)";
 
 export default class Application extends GroupView {
     constructor(id) {
@@ -32,7 +34,7 @@ export default class Application extends GroupView {
         this.keyboard = new Keyboard();
 
         /**
-         * @type {VideoPlayer}
+         * @type {RealPlayer}
          * @private
          */
         this._player = null;
@@ -86,7 +88,7 @@ export default class Application extends GroupView {
     }
 
     create(page, param) {
-        this.onCreate(page, param);
+        this.onCreate(page, param);// 显示页面到前台
         this.startPage(page, param);
     }
 
@@ -223,7 +225,7 @@ export default class Application extends GroupView {
 
     /**
      * 在子类中重写，返回一个全局方法器
-     * @returns{VideoPlayer}
+     * @returns{RealPlayer}
      */
     getPlayerInstance() {
         console.error("获取播放器方法（getPlayInstance）未重写")
@@ -248,8 +250,7 @@ export default class Application extends GroupView {
      * @param param
      */
     onCreate(page, param) {
-        // 显示页面到前台
-        this.startPage(page, param);
+
     }
 
     onStop() {

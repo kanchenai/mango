@@ -6,33 +6,33 @@ module.exports = {
     entry: './src/main',
     output: {
         filename: "[name].js",
-        path: path.resolve(__dirname, './dist'),
+        path: path.resolve(__dirname, './dist')
     },
     module: {
         rules: [
             {
                 test: /\.css$/,//也可以是数组
-                exclude: path.resolve(__dirname, 'src/css'),
+                exclude: [path.resolve(__dirname, 'src/css'),path.resolve(__dirname, 'core/frame/view/css')],
                 use: [MiniCssExtractPlugin.loader, 'css-loader'],
                 resolve: {}
             },
             {
                 test: /\.css$/,//也可以是数组
-                include: path.resolve(__dirname, 'src/css'),
+                include: [path.resolve(__dirname, 'src/css'),path.resolve(__dirname, 'core/frame/view/css')],
                 use: [MiniCssExtractPlugin.loader, 'css-loader', "view-css-loader"],
                 resolve: {}
             },
             {
-                //匹配js，使用babel-loader进行代码转化
-                test:/\.js$/,
-                use:{
+                //匹配js，使用babel-loader进行代码转化,将代码转成es5（配置在.babelrc文件）
+                test: /\.js$/,
+                use: {
                     loader: "babel-loader"
                 }
             },
             {
                 test: [/\.html$/],
-                include: path.resolve(__dirname, 'src/html/'),
-                use: ["html-withimg-loader", "view-html-loader"],//html-withimg-loader,图片使用url-loader另行打包
+                include: [path.resolve(__dirname, 'src/html/'),path.resolve(__dirname, 'core/frame/view/html/')],
+                use: ["html-withimg-loader", "view-html-loader"],
             },
             // {
             //     test: [/\.html$/],
@@ -47,7 +47,6 @@ module.exports = {
                     options: {
                         name: "static/[path][name].[ext]",
                         output: "imgs",
-                        context: path.resolve(__dirname, './src'),//过滤掉[path]的相对路径
                     }
                 },
             },
@@ -58,17 +57,15 @@ module.exports = {
                     loader: 'url-loader',
                     options: {
                         limit: 5000,
-                        name: 'static/[path][name]_[contenthash:8].[ext]',
+                        name: 'static/[path][name].[ext]',
                         context: path.resolve(__dirname, './src'),//过滤掉[path]的相对路径
-                        publicPath:'./',
+                        publicPath: './',
                         esModule: false
                     }
 
                 }]
 
             }
-
-
         ],
         // noParse: /jquery/
     },
@@ -100,7 +97,7 @@ module.exports = {
         })
     ],
     mode: "development",//运行环境：开发环境
-    mode: "production",//运行环境：生产环境
+    // mode: "production",//运行环境：生产环境
 
     performance: {
         hints: 'error',//提示等级
@@ -111,9 +108,8 @@ module.exports = {
         modules: [path.resolve(__dirname, "./core/loader"), 'node_modules']
     },
     // devServer: {//一般使用默认
-    // },
-    //使用source-map直接调试es6代码
-    devtool: 'source-map',
+    // }
+    devtool: 'source-map',//打包时，注释掉这行
     // devtool: false,//打包时，解注释这行
     stats: "errors-only",
 }
