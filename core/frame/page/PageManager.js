@@ -7,8 +7,8 @@ import LocalData from "../util/LocalData";
 export default class PageManager {
     constructor(application) {
         this.application = application;
-        this.pageInfoList = this.getPageInfo() || [];
         this.pageInfoKey = "PAGE_INFO";
+        this.pageInfoList = this.getPageInfo() || [];
 
         this._pageTypeCallback = function (pageName) {
             console.error("请在Application的子类中设置该回调！")
@@ -31,6 +31,8 @@ export default class PageManager {
     recoveryPageList() {
         for (var pageInfo of this.pageInfoList) {
             var page = this.createPageByName(pageInfo.pageName);
+            page.application = this.application;
+            page.param = pageInfo.param;//将数据保存在爬格子中
             this.application.pageList.push(page);
         }
     }
@@ -101,7 +103,7 @@ export default class PageManager {
      * @returns {*[]}
      */
     getPageInfo() {
-        var data = LocalData.getData(this.pageInfoKey);
+        var data = LocalData.getData(this.pageInfoKey) || "[]";
         // data = '[{"pageName":"HomePage","param":{}},{"pageName":"ListPage","param":{"data":"llllll"}},{"pageName":"TestPage","param":{"data":"tttttt"}}]';
         var objects = JSON.parse(data);
         if (!objects || objects.length == 0) {

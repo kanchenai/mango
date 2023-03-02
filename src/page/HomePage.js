@@ -108,7 +108,7 @@ export default class HomePage extends Page {
     }
 
     onResume() {
-        // console.log(this.pageName + "-onResume");
+        console.log(this.pageName + "-onResume");
     }
 
     onPause() {
