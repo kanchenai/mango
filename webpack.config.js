@@ -6,7 +6,11 @@ module.exports = {
     entry: './src/main',
     output: {
         filename: "[name].js",
-        path: path.resolve(__dirname, './dist')
+        path: path.resolve(__dirname, './dist'),
+        clean: true,//清除上次打包文件
+        environment: {//不使用用箭头函数
+            arrowFunction: false
+        }
     },
     module: {
         rules: [
