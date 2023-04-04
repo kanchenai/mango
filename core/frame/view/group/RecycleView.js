@@ -503,7 +503,7 @@ export default class RecycleView extends GroupView {
         if (col) {
             col = parseInt(col);
             if (col > 0) {
-                this.row = col;
+                this.col = col;
             } else {
                 console.warn("view-col值 错误")
             }
@@ -716,6 +716,14 @@ export class Holder {
 
     findEleById(id) {
         return this.component.findEleById(id);
+    }
+
+    /**
+     * 数据下标
+     * @return {number}
+     */
+    get dataIndex(){
+        return (this.index + this.recycleView.data.length) % this.recycleView.data.length;
     }
 }
 

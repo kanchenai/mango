@@ -3,7 +3,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/main',
+    entry: ['@babel/polyfill', './src/main'],//引入es6中无法被编译的新api
+    // entry: './src/main',
     output: {
         filename: "[name].js",
         path: path.resolve(__dirname, './dist'),
@@ -109,7 +110,7 @@ module.exports = {
         maxEntrypointSize: 2 * 1024 * 1024 // 文件大小性能阈值，整数类型（以字节为单位）1M，超过这个大小，打包失败
     },
     resolveLoader: {
-        modules: [path.resolve(__dirname, "./core/loader"), 'node_modules']
+        modules: [path.resolve(__dirname, "./core/loader"), 'node_modules']//loader先在./core/loader找，然后再在node_modules找
     },
     // devServer: {//一般使用默认
     // }
