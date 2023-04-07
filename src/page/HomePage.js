@@ -25,11 +25,6 @@ import SearchPage from "@page/SearchPage";
 import ConfirmDialog from "@src/dialog/ConfirmDialog";
 
 export default class HomePage extends Page {
-    constructor() {
-        super();
-        this.pageName = "HomePage";
-    }
-
     onCreate(param) {
         this.html = html;
         this.initView();

@@ -5,12 +5,6 @@ import ListRecommendFragment from "@fragment/list/ListRecommendFragment";
 import ListVarietyFragment from "@fragment/list/ListVarietyFragment";
 
 export default class ListPage extends Page{
-
-    constructor() {
-        super();
-        this.pageName = "ListPage";
-    }
-
     onCreate(param){
         this.html = html;
         this.initView();

@@ -11,12 +11,6 @@ import poster_5 from "@images-js/search/poster_5.png";
 import DetailPage from "@page/DetailPage";
 
 export default class SearchPage extends Page {
-
-    constructor() {
-        super();
-        this.pageName = "SearchPage";
-    }
-
     onCreate(param) {
         this.html = html;
         console.log(this.pageName, "param", param);

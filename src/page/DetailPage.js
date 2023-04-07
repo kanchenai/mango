@@ -47,11 +47,6 @@ import PlayInfo from "@core/frame/player/PlayInfo";
 import utils from "@src/util/utils";
 
 export default class DetailPage extends Page {
-    constructor() {
-        super();
-        this.pageName = "DetailPage";
-    }
-
     onCreate(param) {
         this.html = html;
 
