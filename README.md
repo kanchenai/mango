@@ -1,47 +1,43 @@
 # view-app
 这是一个在原生js基础上开发的针对iptv行业的交互框架
 
-环境
+### 环境及npm命令
+
 * node环境
 * 使用webpack打包
 
-初始化工程
+#### 初始化工程
+
 ```
     npm install
 ```
 
-运行
+#### 本地调试运行
+
 ```
     npm run server
     或
     npm run dev
 ```
 
-打包
+#### 打包
+
+* 测试环境使用
+
 ```
-    npm run start
-    或
-    npm run build
+  npm run build-dev
+```
+
+* 生产环境使用
+```
+  npm run build
+  或
+  npm run start
+  或
+  npm run build-pro
 ```
 
 参考了android的Application和activity实现整个页面的交互及生命周期
-
-
-### 打包
-
-注释webpack.config.js中的"devtool: 'source-map'"
-
-解注释devtool: false
-```javascript
-    devtool: 'source-map',//打包时，注释掉这行
-    // devtool: false,//打包时，解注释这行
-```
-
-将打包模式为生产模式
-```javascript
-    mode: "development"//运行环境：开发环境
-    // mode: "production",//运行环境：生产环境
-```
 
 #### 图片注意点
 

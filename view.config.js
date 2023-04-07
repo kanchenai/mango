@@ -15,7 +15,7 @@ export var PageConfig = {
 
 /**
  * 默认的page
- * 当未获取到第一个页面时，会使用改页面
+ * 当未获取到第一个页面时，会使用该页面
  * @type {string}
  */
 export var LaunchPage = "HomePage";
