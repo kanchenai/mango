@@ -1,12 +1,6 @@
-import ScrollView, {
-    ScrollCenter,
-    ScrollEnd,
-    ScrollNormal,
-    ScrollStart
-} from "@core/frame/view/base/ScrollView";
+import ScrollView  from "@core/frame/view/base/ScrollView";
 import Keyboard from "@core/frame/app/Keyboard";
 import VPosition from "@core/frame/util/VPosition";
-import View from "@core/frame/view/base/View";
 import ItemView from "@core/frame/view/base/ItemView";
 
 export default class GroupView extends ScrollView {
@@ -20,12 +14,6 @@ export default class GroupView extends ScrollView {
         this.frontView = null;
         this.select = false;
 
-        /**
-         * @type{string|object}
-         * @private
-         */
-        this._scrollLocate = ScrollNormal;
-
         //焦点向上的view或方法的命名
         this.nextUp = "";
         //焦点向下的view或方法
@@ -34,6 +22,18 @@ export default class GroupView extends ScrollView {
         this.nextLeft = "";
         //焦点向右的view或方法
         this.nextRight = "";
+
+        this.props.concat({
+            "view-focusable": "",
+            "view-up": "",
+            "view-down": "",
+            "view-left": "",
+            "view-right": "",
+            "view-change": "",
+            "view-click": "",
+            "view-focus": "",
+            "view-select": ""
+        })
     }
 
     set html(html) {
@@ -269,14 +269,6 @@ export default class GroupView extends ScrollView {
         }
     }
 
-    set scrollLocate(value) {
-        this._scrollLocate = value;
-    }
-
-    get scrollLocate() {
-        return this._scrollLocate;
-    }
-
     /**
      * 加载当前控件绑定的图片资源
      * 就是把图片url设置到对应节点的src
@@ -289,7 +281,7 @@ export default class GroupView extends ScrollView {
             for (var child of this.childViews) {
                 if (child instanceof ScrollView) {
                     child.loadImageResource(true);
-                } else if(child instanceof ItemView){
+                } else if (child instanceof ItemView) {
                     child.loadImageResource();
                 }
             }
@@ -299,13 +291,18 @@ export default class GroupView extends ScrollView {
     setAttributeParam() {
         super.setAttributeParam();
 
+        var focusable = this.props["view-focusable"];//上是否可以上焦
+        if (focusable == "false" || focusable == "0") {
+            this.focusable = false;
+        }
+
         var firstFocus = this.ele.hasAttribute("first-focus");
 
-        var up = View.parseAttribute("view-up", this.ele);//上
-        var down = View.parseAttribute("view-down", this.ele);//下
-        var left = View.parseAttribute("view-left", this.ele);//左
-        var right = View.parseAttribute("view-right", this.ele);//右
-        var change = View.parseAttribute("view-change", this.ele);//上、下、左、右
+        var up = this.props["view-up"];//上
+        var down = this.props["view-down"];//下
+        var left = this.props["view-left"];//左
+        var right = this.props["view-right"];//右
+        var change = this.props["view-change"];//上、下、左、右
         if (change) {
             var strs = change.split(",");
             if (strs.length == 4) {
@@ -315,31 +312,35 @@ export default class GroupView extends ScrollView {
                 right = strs[3];
             }
         }
+        if(up){
+            this.nextUp = up;
+        }
+        if(down){
+            this.nextDown = down;
+        }
+        if(left){
+            this.nextLeft = left;
+        }
+        if(right){
+            this.nextRight = right;
+        }
 
-        var click = View.parseAttribute("view-click", this.ele);//点击
-        var focus = View.parseAttribute("view-focus", this.ele);//焦点变化
-        this.setFocusChange(up, down, left, right);
+        var click = this.props["view-click"];//点击
+        var focus = this.props["view-focus"];//焦点变化
 
-        this.onClickListener = click || "";
-        this.onFocusChangeListener = focus || "";
+        if (click) {
+            this.onClickListener = click;
+        }
 
-        var select = View.parseAttribute("view-select", this.ele);//离开是是否驻留
+        if (focus) {
+            this.onFocusChangeListener = focus;
+        }
+
+
+        var select = this.props["view-select"];//离开是是否驻留
 
         if (select == "1" || select == "true") {
             this.select = true;
-        }
-
-        var scrollLocate = View.parseAttribute("view-locate",this.ele);
-        if(scrollLocate == "start"){
-            this.scrollLocate = ScrollStart;
-        }else if(scrollLocate == "center"){
-            this.scrollLocate = ScrollCenter;
-        }else if(scrollLocate == "end"){
-            this.scrollLocate = ScrollEnd;
-        }else{
-            if(scrollLocate){
-                console.warn("view-locate值 错误")
-            }
         }
 
         return firstFocus;
@@ -788,13 +789,10 @@ export default class GroupView extends ScrollView {
     static parseByEle(ele, viewManager, listenerLocation) {
         var groupView = new GroupView(viewManager, listenerLocation);
         groupView.ele = ele;
-        var firstFocus = groupView.setAttributeParam(ele);
         groupView.bindImage();
+        groupView.bindText();
         groupView.scroller.init();
         viewManager.eleToObject(groupView.scroller.ele, groupView, listenerLocation);//往内部执行
-        if (!viewManager.focusView && firstFocus) {
-            viewManager.focusView = groupView;
-        }
         return groupView;
     }
 }

@@ -1,10 +1,10 @@
 import Page from "@core/frame/page/Page";
-import IptvPlayer from "@core/frame/player/IptvPlayer";
 import PlayInfo from "@core/frame/player/PlayInfo";
 
 /**
  * 当切换播放器时（页面跳转或Fragment切换），需要先暂停或停止，然后在进行切换播放器（页面跳转或Fragment切换）
  * 不然会同时触发多个相同的监听（如：onPositionChangeListener）
+ * TODO 播放直播会有点问题
  */
 export default class VideoPlayer {
     constructor(listenerLocation) {
@@ -18,10 +18,10 @@ export default class VideoPlayer {
         this.player = this.page.application.player;
 
         var player = this;
-        if (this.player instanceof IptvPlayer) {
-            this.page.key_player_event = function (eventJson) {
-                key_player_event(player, eventJson);
-            }
+
+        //这个方法只会在IPTV播放器触发
+        this.page.key_player_event = function (eventJson) {
+            key_player_event(player, eventJson);
         }
 
         //音量增减
@@ -104,8 +104,10 @@ export default class VideoPlayer {
     /**
      * @param{number} startTime
      * @param{PlayInfo} playInfo
+     * @param{string} code 在部分地区的运营商需要使用code播放
+     * @param{string} epgDomain 配合code使用
      */
-    play(startTime, playInfo) {
+    play(startTime, playInfo, code, epgDomain) {
         this.bookmark = -1;
         //触发播放开始
         this.isOnStart = false;
@@ -117,7 +119,7 @@ export default class VideoPlayer {
         if (playInfo) {
             this.playInfo = playInfo;
         }
-        this.player.play(startTime, playInfo);
+        this.player.play(startTime, playInfo, code, epgDomain);
         this._isMute = this.player.isMute;
 
         this.player.playInfo = playInfo;//暂存，用以暂停继续
@@ -156,11 +158,11 @@ export default class VideoPlayer {
     }
 
     resume() {
-        if(!this.player.playInfo || !this.isOnStart || this.isPlaying){//从未播放
+        if (!this.player.playInfo || !this.isOnStart || this.isPlaying) {//从未播放
             return;
         }
         if (this.player.playInfo != this.playInfo) {//playInfo发生变化,播放信息改变了,需要根据书签播放
-            console.log("使用书签resume",this.bookmark);
+            console.log("使用书签resume", this.bookmark);
             this.play(this.bookmark, this.playInfo);
             this.isOnStart = true;//不触发播放开始
         } else {//未切换，只是暂停
@@ -260,7 +262,7 @@ export default class VideoPlayer {
             if (!player.isOnStart) {//未触发开始播放时
                 player.callPlayStart();
             }
-            this._isPlaying = true;
+            player._isPlaying = true;
             player.callPositionChangeListener(currentPosition, duration);
 
             if (!player.isOnComplete) {//未触发开始结束时
@@ -286,7 +288,9 @@ export default class VideoPlayer {
                 console.error("播放进度变化监听设置错误");
                 return;
             }
-            onPositionChangeListener.call(this.listenerLocation, position, duration);
+            if(onPositionChangeListener){
+                onPositionChangeListener.call(this.listenerLocation, position, duration);
+            }
         }
     }
 
@@ -301,7 +305,9 @@ export default class VideoPlayer {
                 console.error("音量变化监听设置错误");
                 return;
             }
-            onVolumeChangeListener.call(this.listenerLocation, volume);
+            if(onVolumeChangeListener){
+                onVolumeChangeListener.call(this.listenerLocation, volume);
+            }
         }
     }
 
@@ -321,7 +327,9 @@ export default class VideoPlayer {
                 console.error("播放开始监听设置错误");
                 return;
             }
-            onPlayStart.call(this.listenerLocation);
+            if(onPlayStart){
+                onPlayStart.call(this.listenerLocation);
+            }
         }
     }
 
@@ -340,7 +348,10 @@ export default class VideoPlayer {
                 console.error("播放结束监听设置错误");
                 return;
             }
-            onPlayComplete.call(this.listenerLocation);
+            if(onPlayComplete){
+                onPlayComplete.call(this.listenerLocation);
+            }
+
         }
     }
 
@@ -355,7 +366,9 @@ export default class VideoPlayer {
                 console.error("播放暂停监听设置错误");
                 return;
             }
-            onPlayPause.call(this.listenerLocation);
+            if(onPlayPause){
+                onPlayPause.call(this.listenerLocation);
+            }
         }
     }
 
@@ -370,7 +383,9 @@ export default class VideoPlayer {
                 console.error("播放继续监听设置错误");
                 return;
             }
-            onPlayResume.call(this.listenerLocation);
+            if(onPlayResume){
+                onPlayResume.call(this.listenerLocation);
+            }
         }
     }
 
@@ -385,7 +400,9 @@ export default class VideoPlayer {
                 console.error("播放停止监听设置错误");
                 return;
             }
-            onPlayStop.call(this.listenerLocation);
+            if(onPlayStop){
+                onPlayStop.call(this.listenerLocation);
+            }
         }
     }
 
@@ -400,7 +417,9 @@ export default class VideoPlayer {
                 console.error("播放异常监听设置错误");
                 return;
             }
-            onPlayError.call(this.listenerLocation);
+            if(onPlayError){
+                onPlayError.call(this.listenerLocation);
+            }
         }
     }
 
@@ -415,7 +434,9 @@ export default class VideoPlayer {
                 console.error("调整播放进度监听设置错误");
                 return;
             }
-            onPlayByTime.call(this.listenerLocation, position);
+            if(onPlayByTime){
+                onPlayByTime.call(this.listenerLocation, position);
+            }
         }
     }
 

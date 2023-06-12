@@ -6,6 +6,7 @@ import View from "@core/frame/view/base/View";
 import {PageLifeState} from "@core/frame/page/Page";
 import "@core/frame/view/css"
 import {LaunchPage, PageConfig} from "../../../view.config";
+import ViewManager from "@core/frame/view/base/ViewManager";
 
 require("../../css/style.css");
 
@@ -14,7 +15,7 @@ require("../../css/style.css");
  * view-app的版本号
  * @type {string}
  */
-export var version = "0.4.1(2023-04-07)";
+export var version = "0.6.5(2023-06-08)";
 
 export default class Application extends GroupView {
     constructor(id) {
@@ -58,18 +59,21 @@ export default class Application extends GroupView {
     launch() {
         console.log("app-launch view-app version：" + this.viewVersion);
         this.scroller.init();
-        //获取页面参数信息数据
-        var pageInfoList = this.pageManager.pageInfoList;
-        //TODO 这里应该有一个判断有哪些参数表示是进入app
         //获取地址栏数据
         this.urlParam = Application.parseUrl();//地址栏参数
+        //获取页面参数信息数据
+        var pageInfoList = null;
+        //判断是否强制使用ENTER模式进入app
+        var focusEnter = this.forceEnter(this.urlParam);
+        if(focusEnter){
+            this.clearCache();//清除page缓存
+        }
+        pageInfoList = this.pageManager.pageInfoList;
         var param = null;//第一个页面的参数信息
         var firstPage = null;
         if (!pageInfoList || pageInfoList.length == 0) {
             this.launchMode = LaunchMode.ENTER;
             console.log("当前启动模式：" + this.launchMode);
-            //清理缓存
-            this.clearCache();
             var object = this.onLaunch(this.urlParam)
             firstPage = object.firstPage;
             param = object.param;
@@ -182,23 +186,14 @@ export default class Application extends GroupView {
      * @param{Page} page
      */
     finishPage(page) {
-        // if (page.lifeState == PageLifeState.RUN) {//运行中
-        //     page.pause();
-        // }
-        //
-        // if (page.lifeState == PageLifeState.PAUSE) {//暂停
-        //     page.stop();
-        // }
-        //
-        // if (page.lifeState == PageLifeState.STOP) {//停止
-        //     page.destroy();
-        // }
-
         page.destroy();
 
         if (this.pageList.length == 0) {
             this.keyboard.page = null;//最后一个页面销毁时的保护机制
-            this.player.page = null;//最后一个页面销毁时的保护机制
+            if(this.player){
+                this.player.page = null;//最后一个页面销毁时的保护机制
+            }
+
             this.stop();//app停止
             this.destroy();//app销毁
         } else {
@@ -221,7 +216,9 @@ export default class Application extends GroupView {
         }
         this.foregroundPage = page;
         this.keyboard.page = null;//保护，防止异常触发
-        this.player.page = null;//保护，防止异常触发
+        if(this.player){
+            this.player.page = null;//保护，防止异常触发
+        }
         page.isForeground = true;
         var param = page.param;
 
@@ -259,6 +256,15 @@ export default class Application extends GroupView {
     getPlayerInstance() {
         console.error("获取播放器方法（getPlayInstance）未重写")
         return this._player;
+    }
+
+    /**
+     * 是否强制以ENTER模式进入app
+     * @param param
+     * @returns {boolean}
+     */
+    forceEnter(param){
+        return false;
     }
 
     /**
@@ -337,6 +343,14 @@ export default class Application extends GroupView {
         }
         return a;
     }
+
+    /**
+     * 避免先import ViewManager导致异常
+     * @param viewBuilderConstructorList
+     */
+    static addCustomViewBuilder(viewBuilderConstructorList){
+        ViewManager.addCustomViewBuilder(viewBuilderConstructorList)
+    }
 }
 
 class ApplicationScroller extends Scroller {
@@ -356,6 +370,9 @@ class ApplicationScroller extends Scroller {
     }
 }
 
+/**
+ * 给对应Page的prototype中赋值pageName值
+ */
 (function(){
     Object.keys(PageConfig).forEach(function (key){
         var page = PageConfig[key];

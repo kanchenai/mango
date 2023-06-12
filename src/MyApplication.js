@@ -1,9 +1,4 @@
 import Application from "../core/frame/app/Application";
-import HomePage from "./page/HomePage";
-import IptvPlayer from "@core/frame/player/IptvPlayer";
-import DetailPage from "@page/DetailPage";
-import ListPage from "@page/ListPage";
-import SearchPage from "@page/SearchPage";
 import AliWebPlayer from "@src/util/AliWebPlayer";
 
 export default class MyApplication extends Application {

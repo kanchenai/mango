@@ -5,6 +5,7 @@ import VSize from "@core/frame/util/VSize";
 import View from "@core/frame/view/base/View";
 import VPosition from "@core/frame/util/VPosition";
 import VMap from "@core/frame/util/VMap";
+import {ViewBuilder} from "@core/frame/view/base/ViewManager";
 
 /**
  *
@@ -44,7 +45,6 @@ export default class RecycleView extends GroupView {
         this.loop = false;
         /**
          * 外边距
-         * TODO 最后一个上焦时，会不符常理的滚动
          * @type {VMargin}
          */
         this.margin = new VMargin(0, 0, 0, 0);
@@ -91,24 +91,117 @@ export default class RecycleView extends GroupView {
          * 焦点或驻留所在的位置index
          * @type {number}
          */
-        this.selectIndex = 0;
+        this._selectIndex = 0;
+
+        /**
+         * 渲染的基准index
+         * @type {number}
+         */
+        this.baseIndex = -1;
+
+        this.props.concat({
+            "view-orientation": "",
+            "view-row": "",
+            "view-col": "",
+            "view-circulate": "",
+            "view-loop": "",
+            "view-margin": "",
+        })
     }
 
     /**
      * 算法中决定，滚动器scroller的width、height是recycleView的3倍
      */
     measure() {
-        this.scrollHeight = this.height * 3;
-        this.scrollWidth = this.width * 3;
+        if (this.seatSize.width < this.width) {
+            this.scrollWidth = this.width * 3;
+        } else {
+            this.scrollWidth = this.seatSize.width * 3;
+        }
+
+        if (this.seatSize.height < this.height) {
+            this.scrollHeight = this.height * 3;
+        } else {
+            this.scrollHeight = this.seatSize.height * 3;
+        }
+
+    }
+
+    push(item) {
+        this.data.push(item);
+        if (this.data.length == 1) {//新增第一个数据
+            computeSeatSize(this);//获取子控件的占位
+        }
+        this.render();
+    }
+
+    pop() {
+        var item = this.data.pop();
+        this.render();
+        return item;
+    }
+
+    unshift(...items) {
+        this.data.unshift(...items);
+        this.render();
+    }
+
+    shift() {
+        var item = this.data.shift();
+        this.render();
+        return item;
+    }
+
+    splice(start, deleteCount, ...items) {
+        this.data.splice(start, deleteCount, ...items);
+        this.render();
+    }
+
+    sort(compareFn) {
+        this.data.sort(compareFn);
+        this.render();
+    }
+
+    reverse() {
+        this.data.reverse();
+        this.render();
+    }
+
+    /**
+     * 根据baseIndex渲染内部组件
+     */
+    render() {
+        if (this.baseIndex >= this.data.length) {
+            this.baseIndex = this.data.length - 1;
+        }
+        if (this.baseIndex < 0) {
+            this.baseIndex = 0;
+        }
+
+        if (this.data.length == 0) {
+            var activeHolderMap = this.activeHolderMap;
+            activeHolderMap.keys().forEach(function (key) {
+                var holder = activeHolderMap.get(key)
+                if (holder) {
+                    holder.recycle()
+                }
+            })
+        } else {
+            render(this, this.baseIndex);
+        }
+
     }
 
     set data(value) {
         this._data = value;
         if (this._data) {
-            // watchData(this._data,this);//重写this._data的数组相关方法，实现改变数组刷新控件
+            // watchData(this._data, this);//重写this._data的数组相关方法，实现改变数组刷新控件
         }
 
-        render(this, 0);
+        computeSeatSize(this);//获取子控件的占位
+
+        this.baseIndex = 0;
+        this.render();
     }
 
     get data() {
@@ -128,18 +221,17 @@ export default class RecycleView extends GroupView {
 
         computeSeatSize(this);//获取子控件的占位
 
-        this.visibleRow = Math.ceil(this.height / this.seatSize.height);//计算可见行（整个component）值
-        this.visibleCol = Math.ceil(this.width / this.seatSize.width);//计算可见列（整个component）值
+        this.baseIndex = 0;
+        this.render();
+    }
 
-        if (this.row == 0) {//未设置行
-            this.row = Math.floor(this.height / this.seatSize.height);
-        }
+    get selectIndex() {
+        var value = (this._selectIndex + this.data.length) % this.data.length;
+        return value;
+    }
 
-        if (this.col == 0) {//未设置列
-            this.col = Math.floor(this.width / this.seatSize.width);
-        }
-
-        render(this, 0);
+    set selectIndex(value) {
+        this._selectIndex = value;
     }
 
     /**
@@ -147,6 +239,10 @@ export default class RecycleView extends GroupView {
      * @param index
      */
     scrollByIndex(index) {
+        if (!this.adapter || this.data.length == 0) {
+            return;
+        }
+
         if (index >= this.data.length) {
             index = this.data.length - 1;
         }
@@ -232,12 +328,14 @@ export default class RecycleView extends GroupView {
         if (typeof scrollLocate == "undefined") {
             scrollLocate = this.scrollLocate;
             if (scrollLocate instanceof Object) {
-                scrollLocate = scrollLocate.vertical;
+                scrollLocate = VERTICAL;
             }
         }
 
-        var top = childView.positionByFather.top - this.margin.top;
-        if (this.height < this.seatSize.height) {
+        var childHeight = childView.height;
+
+        var top = childView.positionByFather.top;
+        if (this.height < childHeight) {
             this.scrollVertical(top);
             return;
         }
@@ -248,81 +346,36 @@ export default class RecycleView extends GroupView {
         var scrollTop = 0;
         if (this.orientation == VERTICAL) {//纵向
             totalRow = Math.ceil(this.data.length / this.col);
+            rowNum = Math.floor(index / this.col);
             if (totalRow < this.visibleRow) {
+                if (scrollLocate == ScrollCenter && this.margin.top > 0) {
+                    this.scrollVertical(top - rowNum * this.seatSize.height - this.margin.top);
+                }
                 return;
             }
             if (this.circulate) {//循环效果
                 if (scrollLocate == ScrollCenter) {
-                    scrollTop = top - (this.height - this.seatSize.height) / 2;
+                    scrollTop = top - (this.height - childHeight) / 2;
                 } else if (scrollLocate == ScrollStart || top < 0) {
                     scrollTop = top;
-                } else if (scrollLocate == ScrollEnd || top > (this.height - this.seatSize.height)) {
-                    scrollTop = top - this.height + this.seatSize.height;
+                } else if (scrollLocate == ScrollEnd || top > (this.height - childHeight)) {
+                    scrollTop = top - this.height + childHeight;
                 }
             } else {
-                rowNum = Math.floor(index / this.col);
                 //直接计算scrollTop
-                if (scrollLocate == ScrollCenter) {
-                    if (rowNum < Math.floor(this.visibleRow / 2)) {//只能滚动到start位置
-                        scrollTop = top - rowNum * this.seatSize.height;
-                    } else if (rowNum + Math.ceil(this.visibleRow / 2) > totalRow) {//只能滚动到end位置
-                        scrollTop = (totalRow - rowNum) * this.seatSize.height + top - this.height;
-                    } else {
-                        scrollTop = top - (this.height - this.seatSize.height) / 2;
-                    }
-                } else if (scrollLocate == ScrollStart) {
-                    if (rowNum + this.visibleRow > totalRow) {
-                        scrollTop = (totalRow - rowNum) * this.seatSize.height + top - this.height;
-                    } else {
-                        scrollTop = top;
-                    }
-                } else if (scrollLocate == ScrollEnd) {
-                    if (rowNum < this.visibleRow - 1) {
-                        scrollTop = top - rowNum * this.seatSize.height;
-                    } else {
-                        scrollTop = top - this.height + this.seatSize.height;
-                    }
-                } else {
-                    if (top < 0) {
-                        scrollTop = top;
-                    } else if (top > (this.height - this.seatSize.height)) {
-                        scrollTop = top - (this.height - this.seatSize.height);
-                    }
-                }
+                scrollTop = computeScrollTop(this, childHeight, top, rowNum, totalRow, scrollLocate);
             }
         } else {//横向时，纵向的滚动
-            if (this.data.length < this.visibleRow) {
+            if (this.data.length < this.visibleRow || this.row * this.seatSize.height - this.margin.bottom < this.height) {
+                if (scrollLocate == ScrollCenter && this.margin.top > 0) {
+                    this.scrollVertical(top - this.margin.top);
+                }
                 return;
             }
             rowNum = index % this.row;
             totalRow = this.row;
-            if (scrollLocate == ScrollCenter) {
-                if (rowNum < Math.floor(this.visibleRow / 2)) {//只能滚动到start位置
-                    scrollTop = top - rowNum * this.seatSize.height;
-                } else if (rowNum + Math.ceil(this.visibleRow / 2) > totalRow) {//只能滚动到end位置
-                    scrollTop = (totalRow - rowNum) * this.seatSize.height + top - this.height;
-                } else {
-                    scrollTop = top - (this.height - this.seatSize.height) / 2;
-                }
-            } else if (scrollLocate == ScrollStart) {
-                if (rowNum + this.visibleRow > totalRow) {
-                    scrollTop = (totalRow - rowNum) * this.seatSize.height + top - this.height;
-                } else {
-                    scrollTop = top;
-                }
-            } else if (scrollLocate == ScrollEnd) {
-                if (rowNum < this.visibleRow - 1) {
-                    scrollTop = top - rowNum * this.seatSize.height;
-                } else {
-                    scrollTop = top - this.height + this.seatSize.height;
-                }
-            } else {
-                if (top < 0) {
-                    scrollTop = top;
-                } else if (top > (this.height - this.seatSize.height)) {
-                    scrollTop = top - (this.height - this.seatSize.height);
-                }
-            }
+            //直接计算scrollTop
+            scrollTop = computeScrollTop(this, childHeight, top, rowNum, totalRow, scrollLocate);
         }
 
         this.scrollVertical(scrollTop);
@@ -346,8 +399,10 @@ export default class RecycleView extends GroupView {
             }
         }
 
-        var left = childView.positionByFather.left - this.margin.left;
-        if (this.width < this.seatSize.width) {
+        var childWidth = childView.width;
+
+        var left = childView.positionByFather.left;
+        if (this.width < childWidth) {
             this.scrollHorizontal(left);
             return;
         }
@@ -356,86 +411,66 @@ export default class RecycleView extends GroupView {
         var colNum = -1;
         var totalCol = -1;
         var scrollLeft = 0;
+
         if (this.orientation == VERTICAL) {
             if (this.data.length < this.visibleCol) {
+                if (scrollLocate == ScrollCenter && this.margin.left > 0) {
+                    this.scrollHorizontal(left - this.margin.left);
+                }
                 return;
             }
             colNum = index % this.col;
             totalCol = this.col;
-            if (scrollLocate == ScrollCenter) {
-                if (colNum < Math.floor(this.visibleCol / 2)) {//只能滚动到start位置
-                    scrollLeft = left - colNum * this.seatSize.width;
-                } else if (colNum + Math.ceil(this.visibleCol / 2) > totalCol) {//只能滚动到end位置
-                    scrollLeft = (totalCol - colNum) * this.seatSize.width + left - this.width;
-                } else {
-                    scrollLeft = left - (this.width - this.seatSize.width) / 2;
-                }
-            } else if (scrollLocate == ScrollStart) {
-                if (colNum + this.visibleCol > totalCol) {
-                    scrollLeft = (totalCol - colNum) * this.seatSize.width + left - this.width;
-                } else {
-                    scrollLeft = left;
-                }
-            } else if (scrollLocate == ScrollEnd) {
-                if (colNum < this.visibleCol - 1) {
-                    scrollLeft = left - colNum * this.seatSize.width;
-                } else {
-                    scrollLeft = left - this.width + this.seatSize.width;
-                }
-            } else {
-                if (left < 0) {
-                    scrollLeft = left;
-                } else if (left > (this.width - this.seatSize.width)) {
-                    scrollLeft = left - (this.width - this.seatSize.width);
-                }
-            }
+            //直接计算scrollLeft
+            scrollLeft = computeScrollLeft(this, childWidth, left, colNum, totalCol, scrollLocate);
         } else {
             totalCol = Math.ceil(this.data.length / this.row);
+            colNum = Math.floor(index / this.row);
             if (totalCol < this.visibleCol) {
+                if (scrollLocate == ScrollCenter && this.margin.left > 0) {
+                    this.scrollHorizontal(left - colNum * this.seatSize.width - this.margin.left);
+                }
                 return;
             }
             if (this.circulate) {//循环效果
                 if (scrollLocate == ScrollCenter) {
-                    scrollLeft = left - (this.width - this.seatSize.width) / 2;
+                    scrollLeft = left - (this.width - childWidth) / 2;
                 } else if (scrollLocate == ScrollStart || left < 0) {
                     scrollLeft = left;
-                } else if (scrollLocate == ScrollEnd || left > (this.width - this.seatSize.width)) {
-                    scrollLeft = left - this.width + this.seatSize.width;
+                } else if (scrollLocate == ScrollEnd || left > (this.width - childWidth)) {
+                    scrollLeft = left - this.width + childWidth;
                 }
             } else {
-                colNum = Math.floor(index / this.row);
                 //直接计算scrollLeft
-                if (scrollLocate == ScrollCenter) {
-                    if (colNum < Math.floor(this.visibleCol / 2)) {//只能滚动到start位置
-                        scrollLeft = left - colNum * this.seatSize.width;
-                    } else if (colNum + Math.ceil(this.visibleCol / 2) > totalCol) {//只能滚动到end位置
-                        scrollLeft = (totalCol - colNum) * this.seatSize.width + left - this.width;
-                    } else {
-                        scrollLeft = left - (this.width - this.seatSize.width) / 2;
-                    }
-                } else if (scrollLocate == ScrollStart) {
-                    if (colNum + this.visibleCol > totalCol) {
-                        scrollLeft = (totalCol - colNum) * this.seatSize.width + left - this.width;
-                    } else {
-                        scrollLeft = left;
-                    }
-                } else if (scrollLocate == ScrollEnd) {
-                    if (colNum < this.visibleCol - 1) {
-                        scrollLeft = left - colNum * this.seatSize.width;
-                    } else {
-                        scrollLeft = left - this.width + this.seatSize.width;
-                    }
-                } else {
-                    if (left < 0) {
-                        scrollLeft = left;
-                    } else if (left > (this.width - this.seatSize.width)) {
-                        scrollLeft = left - (this.width - this.seatSize.width);
-                    }
-                }
+                scrollLeft = computeScrollLeft(this, childWidth, left, colNum, totalCol, scrollLocate);
             }
         }
 
         this.scrollHorizontal(scrollLeft);
+    }
+
+    /**
+     * 置空
+     */
+    scrollVerticalToStart() {
+    }
+
+    /**
+     * 置空
+     */
+    scrollVerticalToEnd() {
+    }
+
+    /**
+     * 置空
+     */
+    scrollHorizontalToStart() {
+    };
+
+    /**
+     * 置空
+     */
+    scrollHorizontalToEnd() {
     }
 
     get adapter() {
@@ -478,19 +513,20 @@ export default class RecycleView extends GroupView {
     }
 
     setAttributeParam() {
-        var eleStr = this.ele.innerHTML;
-        if (eleStr) {
+        var firstFocus = super.setAttributeParam();
+        if (this.ele.children.length > 0) {
+            var eleStr = this.ele.innerHTML;
             this.template = eleStr;
             this.ele.innerHTML = "";
         }
 
-        var orientation = View.parseAttribute("view-orientation", this.ele);
+        var orientation = this.props["view-orientation"]
         if (orientation == "vertical" || orientation == "v") {
             this.orientation = VERTICAL;
         } else if (orientation == "horizontal" || orientation == "h") {
             this.orientation = HORIZONTAL;
         }
-        var row = View.parseAttribute("view-row", this.ele);
+        var row = this.props["view-row"];
         if (row) {
             row = parseInt(row);
             if (row > 0) {
@@ -499,7 +535,7 @@ export default class RecycleView extends GroupView {
                 console.warn("view-row值 错误")
             }
         }
-        var col = View.parseAttribute("view-col", this.ele);
+        var col = this.props["view-col"];
         if (col) {
             col = parseInt(col);
             if (col > 0) {
@@ -509,15 +545,15 @@ export default class RecycleView extends GroupView {
             }
         }
 
-        var circulate = View.parseAttribute("view-circulate", this.ele);
+        var circulate = this.props["view-circulate"];
         if (circulate == "true" || circulate == "1") {
             this.circulate = true;
         }
-        var loop = View.parseAttribute("view-loop", this.ele);
+        var loop = this.props["view-loop"];
         if (loop == "true" || loop == "1") {
             this.loop = true;
         }
-        var margin = View.parseAttribute("view-margin", this.ele);
+        var margin = this.props["view-margin"];
         if (margin) {
             var marginStrs = margin.split(",");
             if (marginStrs.length == 1) {
@@ -550,21 +586,16 @@ export default class RecycleView extends GroupView {
             }
         }
 
-        return super.setAttributeParam();
+        return firstFocus;
     }
 
     static parseByEle(ele, viewManager, listenerLocation) {
         var recycleView = new RecycleView(viewManager, listenerLocation);
         recycleView.ele = ele;
-        var viewDefault = recycleView.setAttributeParam();
 
         recycleView.scroller.init();
         recycleView.measure();
         centerScroller(recycleView);//让滚动器居中
-
-        if (viewDefault) {
-            viewManager.focusView = recycleView;
-        }
 
         return recycleView;
     }
@@ -603,6 +634,7 @@ export class Adapter {
     }
 
     set template(value) {
+        value = ViewBuilder.buildHtml(value);
         this._template = value;
     }
 }
@@ -689,9 +721,8 @@ export class Holder {
     }
 
     get space() {
-        var margin = this.recycleView.margin;
-        var height = margin.top + margin.bottom + this.component.height;//列距
-        var width = margin.left + margin.right + this.component.width;//行距
+        var height = this.component.height;//列距
+        var width = this.component.width;//行距
 
         return new VSize(width, height);
     }
@@ -722,7 +753,7 @@ export class Holder {
      * 数据下标
      * @return {number}
      */
-    get dataIndex(){
+    get dataIndex() {
         return (this.index + this.recycleView.data.length) % this.recycleView.data.length;
     }
 }
@@ -754,6 +785,7 @@ export class Component extends GroupView {
         this.viewManager.buildView(this);
         //测量滚动器实际大小，并设置
         this.measure();
+        this.bindText();
         //绑定ImageView
         this.bindImage();
 
@@ -807,8 +839,9 @@ var buildComponent = function (holder) {
     }
 
     var seatSize = holder.recycleView.seatSize;
-    component.width = seatSize.width;
-    component.height = seatSize.height;
+    var margin = holder.recycleView.margin;
+    component.width = seatSize.width - (margin.left + margin.right);
+    component.height = seatSize.height - (margin.top + margin.bottom);
 
     component.html = holder.eleStr;
 
@@ -818,33 +851,49 @@ var buildComponent = function (holder) {
 /**
  * 计算一个component占位大小,adapter是后续设置的，不在原recycleView节点中
  * 使用holder（已回收/新创建的）获取size+margin
+ * 只能计算当前样式时的size，如果在adapter中改变的，不会被计算到
  * @param recycleView
  * @returns {VSize}
  */
 var computeSeatSize = function (recycleView) {
     var seatSize = new VSize(0, 0);
-    if (!recycleView.adapter) {
+    if (!recycleView.adapter || recycleView.data.length == 0) {
         return seatSize;
     }
 
+    // var invisibleDiv = buildInvisibleDiv();
+    // invisibleDiv.innerHTML = recycleView.adapter.template;
+    // recycleView.ele.appendChild(invisibleDiv);//不可见渲染
+    //
+    // var size = View.getVisibleSize(invisibleDiv);//组件宽高
+    //
+    // invisibleDiv.remove();//将当前节点从application中移除
+    // //兼容ele.remove无效
+    // if (recycleView.ele.contains(invisibleDiv)) {
+    //     recycleView.ele.removeChild(invisibleDiv);
+    // }
 
-    var invisibleDiv = buildInvisibleDiv();
-    invisibleDiv.innerHTML = recycleView.adapter.template;
-    recycleView.ele.appendChild(invisibleDiv);//不可见渲染
-
-    var size = View.getVisibleSize(invisibleDiv);//组件宽高
-
-    invisibleDiv.remove();//将当前节点从application中移除
-    //兼容ele.remove无效
-    if (recycleView.ele.contains(invisibleDiv)) {
-        recycleView.ele.removeChild(invisibleDiv);
-    }
-
+    renderBase(recycleView, 0);
+    var holder = recycleView.activeHolderMap.get(0);
+    var size = View.getVisibleSize(holder.component.ele);//组件宽高
+    holder.component.size = size;//设置holder.component宽高
     var margin = recycleView.margin;
     var width = size.width + margin.left + margin.right;
     var height = size.height + margin.top + margin.bottom;
 
     recycleView.seatSize = new VSize(width, height);
+
+    //根据seatSize，设置一些属性
+    recycleView.visibleRow = Math.ceil(recycleView.height / recycleView.seatSize.height);//计算可见行（整个component）值
+    recycleView.visibleCol = Math.ceil(recycleView.width / recycleView.seatSize.width);//计算可见列（整个component）值
+
+    if (recycleView.row == 0) {//未设置行
+        recycleView.row = Math.floor(recycleView.height / recycleView.seatSize.height);
+    }
+
+    if (recycleView.col == 0) {//未设置列
+        recycleView.col = Math.floor(recycleView.width / recycleView.seatSize.width);
+    }
 }
 
 var render = function (recycleView, index) {
@@ -855,6 +904,8 @@ var render = function (recycleView, index) {
     if (!recycleView.adapter) {
         return;
     }
+
+    recycleView.baseIndex = index;
 
     var obj = renderBase(recycleView, index);
     index = obj.index;
@@ -901,7 +952,7 @@ var renderBase = function (recycleView, index) {
         position = holder.component.getPositionByFather();
         if (index < 0 || index >= data.length) {//在正常范围外
             index = (index + data.length) % data.length;//调整index，使在正常范围
-            holder.changIndex(index);//将holder的index调整到征程范围
+            holder.changIndex(index);//将holder的index调整到正常范围
         }
     } else {
         position = new VPosition(0, 0);
@@ -912,9 +963,10 @@ var renderBase = function (recycleView, index) {
         if (!holder) {//重新获取的holder不存在
             holder = getEmptyHolder(recycleView);//获取一个空的holder
             holder.active(index);//使用正常范围的index激活
-            adapter.bindHolder(holder, data[index]);//绑定数据
         }
     }
+
+    adapter.bindHolder(holder, data[index]);//绑定数据
 
     centerScroller(recycleView);
     setChildPosition(recycleView, holder.component, position);
@@ -941,7 +993,7 @@ var renderSmaller = function (recycleView, baseIndex, basePosition) {
     if (recycleView.orientation == VERTICAL) {
         minNum = recycleView.col;
         if (scrollLocate == ScrollEnd) {
-            minNum = minNum * (recycleView.visibleRow - 1);
+            minNum = minNum * recycleView.visibleRow;
         } else if (scrollLocate == ScrollCenter) {
             minNum = minNum * Math.ceil(recycleView.visibleRow / 2);
         }
@@ -950,7 +1002,7 @@ var renderSmaller = function (recycleView, baseIndex, basePosition) {
     } else {
         minNum = recycleView.row;
         if (scrollLocate == ScrollEnd) {
-            minNum = minNum * (recycleView.visibleCol - 1);
+            minNum = minNum * recycleView.visibleCol;
         } else if (scrollLocate == ScrollCenter) {
             minNum = minNum * Math.ceil(recycleView.visibleCol / 2);
         }
@@ -1025,7 +1077,7 @@ var renderBigger = function (recycleView, baseIndex, basePosition) {
     if (recycleView.orientation == VERTICAL) {
         minNum = recycleView.col;
         if (scrollLocate == ScrollStart) {
-            minNum = minNum * (recycleView.visibleRow - 1);
+            minNum = minNum * recycleView.visibleRow;
         } else if (scrollLocate == ScrollCenter) {
             minNum = minNum * Math.ceil(recycleView.visibleRow / 2);
         }
@@ -1035,7 +1087,7 @@ var renderBigger = function (recycleView, baseIndex, basePosition) {
     } else {
         minNum = recycleView.row;
         if (scrollLocate == ScrollStart) {
-            minNum = minNum * (recycleView.visibleCol - 1);
+            minNum = minNum * recycleView.visibleCol;
         } else if (scrollLocate == ScrollCenter) {
             minNum = minNum * Math.ceil(recycleView.visibleCol / 2);
         }
@@ -1151,7 +1203,7 @@ var getEmptyHolder = function (recycleView) {
  * 使recycleView的滚动器居中
  * @param recycleView
  */
-var centerScroller = function (recycleView) {
+export var centerScroller = function (recycleView) {
     var distanceLeft = recycleView.width - recycleView.scrollLeft;
     var distanceTop = recycleView.height - recycleView.scrollTop;
 
@@ -1163,8 +1215,8 @@ var centerScroller = function (recycleView) {
 
     recycleView.measure();//由于存在拉大滚动器的情况，在每一次变化时，重制滚动器的大小
 
-    recycleView.scrollTop = recycleView.height;//纵向居中
-    recycleView.scrollLeft = recycleView.width;//横行居中
+    recycleView.scrollTop = Math.ceil(recycleView.scrollHeight / 3);//纵向居中
+    recycleView.scrollLeft = Math.ceil(recycleView.scrollWidth / 3);//横行居中
 }
 
 /**
@@ -1176,8 +1228,18 @@ var centerScroller = function (recycleView) {
 var setChildPosition = function (recycleView, childView, position) {
     var left = position.left + recycleView.scrollLeft;
     var top = position.top + recycleView.scrollTop;
+
     childView.top = top;
     childView.left = left;
+
+    if (recycleView.margin.left > 0) {
+        left -= recycleView.margin.left;
+    }
+
+    if (recycleView.margin.top > 0) {
+        top -= recycleView.margin.top;
+    }
+
     if (top < 0) {//childView已经在recycleView.scroller的范围外的上边了，需要校准
         recycleView.scrollHeight -= top;//将recycleView拉高
         recycleView.scrollTop -= top;
@@ -1189,14 +1251,114 @@ var setChildPosition = function (recycleView, childView, position) {
     }
 
     if (left < 0) {//childView已经在recycleView.scroller的范围外的左边了，需要校准
-        recycleView.scrollWidth -= left;//将recycleView拉高
+        recycleView.scrollWidth -= left;//将recycleView拉宽
         recycleView.scrollLeft -= left;
+
         for (var child of recycleView.childViews) {
             child.left = child.left - left;//将child复位
         }
     } else if (left > recycleView.scrollWidth - recycleView.scrollLeft) {//childView已经在recycleView.scroller的范围外的右边了，需要校准
         recycleView.scrollWidth = left + recycleView.scrollLeft;//将recycleView拉高
     }
+}
+
+
+/**
+ * 计算滚动的距离
+ * @param childHeight 子控件高度
+ * @param top 子控件相对于RecycleView顶部可见距离
+ * @param rowNum 子控件的行
+ * @param totalRow 总行数
+ * @param scrollLocate 滚动模式
+ * @return {number}
+ */
+var computeScrollTop = function (recycleView, childHeight, top, rowNum, totalRow, scrollLocate) {
+    var scrollTop = 0;
+    if (scrollLocate == ScrollCenter) {
+        if (recycleView.visibleRow > 1) {//可见行多行时，才有最顶、最底
+            if (rowNum * recycleView.seatSize.height + childHeight / 2 <= recycleView.height / 2 || totalRow < recycleView.visibleRow) {//最顶部
+                scrollTop = top - rowNum * recycleView.seatSize.height;
+                if (recycleView.margin.top > 0) {
+                    scrollTop -= recycleView.margin.top;
+                }
+            } else if ((totalRow - rowNum) * recycleView.seatSize.height - childHeight / 2 <= recycleView.height / 2) {//最底部
+                scrollTop = top - (recycleView.height - (totalRow - rowNum) * recycleView.seatSize.height) - recycleView.margin.top;
+            } else {
+                scrollTop = top - (recycleView.height - childHeight) / 2;
+            }
+        } else {//单行时，只能居中
+            scrollTop = top - (recycleView.height - childHeight) / 2;
+        }
+    } else if (scrollLocate == ScrollStart) {
+        if ((totalRow - rowNum) * recycleView.seatSize.height - recycleView.margin.top < recycleView.height) {//最底部
+            scrollTop = (totalRow - rowNum) * recycleView.seatSize.height - recycleView.margin.top + top - recycleView.height;
+        } else {
+            scrollTop = top;
+        }
+    } else if (scrollLocate == ScrollEnd) {
+        if ((rowNum + 1) * recycleView.seatSize.height - recycleView.margin.bottom < recycleView.height) {//最顶部
+            scrollTop = top - (rowNum * recycleView.seatSize.height + recycleView.margin.top)
+        } else {
+            scrollTop = top + childHeight - recycleView.height
+        }
+    } else {
+        if (top < 0) {
+            scrollTop = top;
+        } else if (top > (recycleView.height - childHeight)) {
+            scrollTop = top - (recycleView.height - childHeight);
+        }
+    }
+
+    return scrollTop;
+}
+
+/**
+ * 计算滚动的距离
+ * @param childWidth 子控件宽度
+ * @param left 子控件相对于RecycleView左侧可见距离
+ * @param colNum 子控件的列
+ * @param totalCol 总列数
+ * @param scrollLocate 滚动模式
+ * @return {number}
+ */
+var computeScrollLeft = function (recycleView, childWidth, left, colNum, totalCol, scrollLocate) {
+    var scrollLeft = 0;
+    if (scrollLocate == ScrollCenter) {
+        if (recycleView.visibleCol > 1) {//可见列多列时，才有最左、最右
+            if (colNum * recycleView.seatSize.width + childWidth / 2 <= recycleView.width / 2 || totalCol < recycleView.visibleCol) {//最左侧
+                scrollLeft = left - colNum * recycleView.seatSize.width;
+                if (recycleView.margin.left > 0) {
+                    scrollLeft -= recycleView.margin.left;
+                }
+            } else if ((totalCol - colNum) * recycleView.seatSize.width - childWidth / 2 <= recycleView.width / 2 && recycleView.visibleCol > 1) {//最右侧
+                scrollLeft = left - (recycleView.width - (totalCol - colNum) * recycleView.seatSize.width) - recycleView.margin.left;
+            } else {
+                scrollLeft = left - (recycleView.width - childWidth) / 2;
+            }
+        } else {//单列时，只能居中
+            scrollLeft = left - (recycleView.width - childWidth) / 2;
+        }
+    } else if (scrollLocate == ScrollStart) {
+        if ((totalCol - colNum) * recycleView.seatSize.width - recycleView.margin.left < recycleView.width) {//最右侧
+            scrollLeft = (totalCol - colNum) * recycleView.seatSize.width - recycleView.margin.left + left - recycleView.width;
+        } else {
+            scrollLeft = left;
+        }
+    } else if (scrollLocate == ScrollEnd) {
+        if ((colNum + 1) * recycleView.seatSize.width - recycleView.margin.right < recycleView.width) {//最左侧
+            scrollLeft = left - (colNum * recycleView.seatSize.width + recycleView.margin.left)
+        } else {
+            scrollLeft = left + childWidth - recycleView.width;
+        }
+    } else {
+        if (left < 0) {
+            scrollLeft = left;
+        } else if (left > (recycleView.width - childWidth)) {
+            scrollLeft = left - (recycleView.width - childWidth);
+        }
+    }
+
+    return scrollLeft;
 }
 
 /**
@@ -1256,20 +1418,3 @@ export var getRowAndCol = function (recycleView, index) {
 }
 
 
-/**
- * TODO 重写this._data的数组相关方法，实现改变数组刷新控件
- * @param data
- */
-var watchData = function (data, recycleView) {
-    var funNames = ['push', 'pop', 'unshift', 'shift', 'splice', 'sort', 'reverse']
-
-    for (var i = 0; i < funNames.length; i++) {
-        var funName = funNames[i];
-        var func = data[funName];
-
-        data[funName] = function () {
-            func.call(data, arguments);
-            render(recycleView, recycleView.selectIndex);
-        }
-    }
-}

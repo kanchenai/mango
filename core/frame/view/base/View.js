@@ -1,7 +1,7 @@
 import VPosition from "../../util/VPosition";
 import VSize from "../../util/VSize";
 import Application from "../../app/Application";
-import ViewManager from "@core/frame/view/base/ViewManager";
+import {ViewBuilder} from "@core/frame/view/base/ViewManager";
 import VMap from "@core/frame/util/VMap";
 
 export default class View {
@@ -57,6 +57,16 @@ export default class View {
          * @type {boolean}
          */
         this.focusable = false;
+
+        /**
+         * 从节点标签中读到的属性及对应的值
+         * 需要在setAttribute方法中转化为对应的属性
+         * @type {{}}
+         */
+        this.props = {
+            "view-id": "",
+            "view-visible": ""
+        }
     }
 
     addChild(view) {
@@ -112,12 +122,6 @@ export default class View {
         return ele;
     }
 
-    /**
-     * @param view
-     * @param isShowing
-     */
-    onVisibleChangeListener(view,isShowing){}
-
     callVisibleChangeListener(view, isShowing) {
         var onVisibleChangeListener = null;
         if (this.onVisibleChangeListener) {
@@ -155,15 +159,36 @@ export default class View {
         this.callVisibleChangeListener(this, false);
     }
 
-    get listenerLocation(){
+    /**
+     * 放大
+     * 如果存在无法放大的，用上焦样式设置尺寸
+     * @param scale
+     */
+    enlarge(scale) {
+        //放大
+        this.setStyle("webkitTransform", "scale(" + scale + "%)");
+        this.setStyle("webkitTransition", "-webkit-transform 0.3s");
+        this.setStyle("transform", "scale(" + scale + "%)");
+        this.setStyle("transition", "transform 0.3s");
+    }
+
+    /**
+     * 恢复100%
+     */
+    restoreEnlarge() {
+        this.setStyle("webkitTransform", "scale(100%)");
+        this.setStyle("transform", "scale(100%)");
+    }
+
+    get listenerLocation() {
         var value = this._listenerLocation;
-        if(!value){
+        if (!value) {
             value = this;
         }
         return value;
     }
 
-    set listenerLocation(value){
+    set listenerLocation(value) {
         this._listenerLocation = value;
     }
 
@@ -250,6 +275,8 @@ export default class View {
      * @param html
      */
     set html(html) {
+        //根据扩展控件的view-type做一层转化
+        html = ViewBuilder.buildHtml(html);
         this.ele.innerHTML = html;
     }
 
@@ -311,6 +338,12 @@ export default class View {
 
     set ele(value) {
         this._ele = value;
+
+        var firstFocus = this.setAttributeParam()
+
+        if (this.focusable && firstFocus && !this.viewManager.focusView) {
+            this.viewManager.focusView = this;
+        }
     }
 
     get style() {
@@ -358,9 +391,12 @@ export default class View {
      * 将标签中的属性解析到对应的变量中
      */
     setAttributeParam() {
+        //根据this.props获取对应值，并赋值到this.props
+        View.getProps(this);
+
         //TODO data绑定，根据listenerLocation,获取对应的应用地址，注意：拷贝方式，是否使用get方法
 
-        var id = View.parseAttribute("view-id", this.ele);
+        var id = this.props["view-id"];
         if (id) {
             this.id = id;
         } else {
@@ -370,11 +406,24 @@ export default class View {
             }
         }
 
-        var visible = View.parseAttribute("view-visible", this.ele);//滚动
+        var visible = this.props["view-visible"];//显示
 
-        this.onVisibleChangeListener = visible || "";
+        if (visible) {
+            this.onVisibleChangeListener = visible;
+        }
 
         return false;
+    }
+
+    static getProps(view) {
+        var props = view.props;
+        var keys = Object.keys(props);
+
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = View.parseAttribute(key, view.ele);
+            props[key] = value;
+        }
     }
 
     static parseAttribute(key, ele) {
@@ -474,27 +523,6 @@ export default class View {
         return isD;
     }
 
-    static bindTextByEle(ele, view) {
-        var ele_list = ele.children;
-        if (ele_list.length == 0) {
-            return [];
-        }
-        for (var child_ele of ele_list) {
-            var viewType = child_ele.tagName;
-            if (viewType == "DIV") {
-                viewType = child_ele.getAttribute("view-type");
-                if (viewType) {
-                    viewType = viewType.toUpperCase();
-                }
-            }
-            if (viewType == "VIEW-TEXT") {
-                view.marquee = child_ele;
-            } else {
-                View.bindTextByEle(child_ele, view);
-            }
-        }
-    }
-
     /**
      * 获取指定节点的当前样式
      * @param{Element} ele
@@ -508,10 +536,16 @@ export default class View {
      * @param{Element} ele
      */
     static getLeft(ele) {
-        var left = View.getStyle(ele).left;
+        var style = View.getStyle(ele);
+        var left = style.left;
         if (left == "auto" || left == "") {
             left = ele.offsetLeft;
+        } else {
+            var borderWidth = View.pxToNum(style.borderWidth);
+            left = View.pxToNum(left) - borderWidth
         }
+
+
         return View.pxToNum(left);
     }
 
@@ -520,10 +554,15 @@ export default class View {
      * @param{Element} ele
      */
     static getTop(ele) {
-        var top = View.getStyle(ele).top;
+        var style = View.getStyle(ele);
+        var top = style.top;
         if (top == "auto" || top == "") {
             top = ele.offsetTop;
+        } else {
+            var borderWidth = View.pxToNum(style.borderWidth);
+            top = View.pxToNum(top) - borderWidth
         }
+
         return View.pxToNum(top);
     }
 
@@ -532,10 +571,15 @@ export default class View {
      * @param{Element} ele
      */
     static getWidth(ele) {
-        var width = View.getStyle(ele).width;
+        var style = View.getStyle(ele);
+        var width = style.width;
         if (width == "auto" || width == "") {
             width = ele.offsetWidth;
+        } else {
+            var borderWidth = View.pxToNum(style.borderWidth);
+            width = View.pxToNum(width) + borderWidth * 2
         }
+
         return View.pxToNum(width);
     }
 
@@ -544,10 +588,16 @@ export default class View {
      * @param{Element} ele
      */
     static getHeight(ele) {
-        var height = View.getStyle(ele).height;
+        var style = View.getStyle(ele);
+        var height = style.height;
         if (height == "auto" || height == "") {
             height = ele.offsetHeight;
+        } else {
+            var borderWidth = View.pxToNum(style.borderWidth);
+
+            height = View.pxToNum(height) + borderWidth * 2;
         }
+
         return View.pxToNum(height);
     }
 
@@ -641,7 +691,6 @@ export default class View {
     static parseByEle(ele, viewManager, listenerLocation) {
         var view = new View(viewManager, listenerLocation);
         view.ele = ele;
-        view.setAttributeParam();
         return view;
     }
 
@@ -654,6 +703,17 @@ export default class View {
         var ele = document.createElement("div");
         ele.innerHTML = html;
         return ele.children;
+    }
+
+    /**
+     * 将ele转化为字符串
+     * @param{String} html
+     * @returns {HTMLCollection}
+     */
+    static eleToStr(ele) {
+        var _ele = document.createElement("div");
+        _ele.appendChild(ele)
+        return _ele.innerHTML;
     }
 
     /**

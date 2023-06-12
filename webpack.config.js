@@ -17,13 +17,21 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,//也可以是数组
-                exclude: [path.resolve(__dirname, 'src/css'),path.resolve(__dirname, 'core/frame/view/css')],
+                exclude: [
+                    path.resolve(__dirname, 'src/css'),
+                    path.resolve(__dirname, 'core/frame/view/css'),
+                    path.resolve(__dirname, 'src/custom-view')
+                ],
                 use: [MiniCssExtractPlugin.loader, 'css-loader'],
                 resolve: {}
             },
             {
                 test: /\.css$/,//也可以是数组
-                include: [path.resolve(__dirname, 'src/css'),path.resolve(__dirname, 'core/frame/view/css')],
+                include: [
+                    path.resolve(__dirname, 'src/css'),
+                    path.resolve(__dirname, 'core/frame/view/css'),
+                    path.resolve(__dirname, 'src/custom-view')
+                ],
                 use: [MiniCssExtractPlugin.loader, 'css-loader', "view-css-loader"],
                 resolve: {}
             },
@@ -36,7 +44,11 @@ module.exports = {
             },
             {
                 test: [/\.html$/],
-                include: [path.resolve(__dirname, 'src/html/'),path.resolve(__dirname, 'core/frame/view/html/')],
+                include: [
+                    path.resolve(__dirname, 'src/html/'),
+                    path.resolve(__dirname, 'core/frame/view/html/'),
+                    path.resolve(__dirname, 'src/custom-view')
+                ],
                 use: ["html-withimg-loader", "view-html-loader"],
             },
             // {
@@ -44,20 +56,19 @@ module.exports = {
             //     include: path.resolve(__dirname,'src/test/'),
             //     use:["html-loader","view-html-loader"]
             // },
-            {
-                test: [/\.png$/, /\.jpg$/, /\.jpeg$/, /\.gif$/],
-                include: path.resolve(__dirname, 'src/images-js/'),//exclude：可以显示在html中的图片；include:不能显示html的图片,可以使用import导入
-                use: {
-                    loader: "file-loader",
-                    options: {
-                        name: "static/[path][name].[ext]",
-                        output: "imgs",
-                    }
-                },
-            },
+            // {
+            //     test: [/\.png$/, /\.jpg$/, /\.jpeg$/, /\.gif$/],
+            //     include: path.resolve(__dirname, 'src/images-js/'),//exclude：可以显示在html中的图片；include:不能显示html的图片,可以使用import导入
+            //     use: {
+            //         loader: "file-loader",
+            //         options: {
+            //             name: "static/[path][name].[ext]",
+            //             output: "imgs",
+            //         }
+            //     },
+            // },
             {
                 test: [/\.png$/, /\.jpg$/, /\.jpeg$/, /\.gif$/],//使用地址引入的图片，使用这个打包
-                exclude: path.resolve(__dirname, 'src/images-js/'),
                 use: [{
                     loader: 'url-loader',
                     options: {
@@ -99,7 +110,7 @@ module.exports = {
             template: "./public/index.html",
             filename: "index.html",
             title: require("./package.json").name,//页面标题
-            favicon:"./public/VALogo.png"//页面标题图标
+            favicon: "./public/logo.png"//页面标题图标
         })
     ],
     //运行环境：开发环境、生产换进，npm run *有选择（不传就是默认development开发环境）

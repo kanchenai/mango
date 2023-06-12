@@ -5,7 +5,7 @@ import FrameView from "../group/FrameView";
 import ItemView from "./ItemView";
 import Dialog from "@core/frame/view/group/Dialog";
 import RecycleView from "@core/frame/view/group/RecycleView";
-import VMap from "@core/frame/util/VMap";
+import PlayerView from "@core/frame/view/single/PlayerView";
 
 /**
  * @constructor
@@ -27,7 +27,6 @@ export default class ViewManager {
      * 因为子控件还未创建及测量,
      * scroller（滚动器）的大小无法被测量
      * @param html
-     * @returns {Element[]|null}
      */
     buildView(view) {
         if (view instanceof GroupView) {
@@ -35,7 +34,6 @@ export default class ViewManager {
         } else if (view instanceof View) {
             this.eleToObject(view.ele, view, view.listenerLocation);
         }
-
     }
 
     /**
@@ -44,7 +42,7 @@ export default class ViewManager {
      * @param{GroupView} groupView
      * @param{View} listenerLocation
      */
-    eleToObject(ele, groupView,listenerLocation) {
+    eleToObject(ele, groupView, listenerLocation) {
         var ele_list = ele.children;
         for (var child_ele of ele_list) {
             var viewType = View.getViewType(child_ele);
@@ -83,8 +81,25 @@ export default class ViewManager {
                     var recycleView = RecycleView.parseByEle(child_ele, this, listenerLocation);
                     groupView.addChild(recycleView);
                     break;
+                case "VIEW-PLAYER":
+                case "PLAYER":
+                    var playerView = PlayerView.parseByEle(child_ele, this, listenerLocation);
+                    groupView.addChild(playerView);
+                    break;
                 default:
-                    this.eleToObject(child_ele, groupView, listenerLocation);
+                    var customView = null;
+                    if (customViewBuilder[viewType]) {//该控件为扩展控件
+                        var viewBuilder = customViewBuilder[viewType];
+                        if (viewBuilder) {
+                            customView = viewBuilder.buildView(child_ele, this, listenerLocation);
+                        }
+                    }
+
+                    if (!customView) {
+                        this.eleToObject(child_ele, groupView, listenerLocation);
+                    } else {
+                        groupView.addChild(customView);
+                    }
                     break;
             }
         }
@@ -138,6 +153,131 @@ export default class ViewManager {
             this.focusView.requestFocus();
         }
     }
+
+    /**
+     * 在main.js中使用时，import顺序，ViewManager一定要比Application（或子类）晚
+     * 添加扩展控件的的builder
+     * 需要在创建页面之前执行，一版在main.js中application.launch()之前
+     * @param{Array} viewBuilderConstructorList
+     */
+    static addCustomViewBuilder(viewBuilderConstructorList) {
+        for (var i = 0; i < viewBuilderConstructorList.length; i++) {
+            var viewBuilder = new viewBuilderConstructorList[i]();//创建一个viewBuilder
+            var viewType = viewBuilder.viewType;
+
+            viewType = viewType.toLocaleUpperCase()
+
+            if (customViewBuilder[viewType]) {//已存在
+                console.error("扩展控件" + viewType + "已被定义");
+            } else {
+                customViewBuilder[viewType] = viewBuilder;
+            }
+        }
+    }
+
+    /**
+     * 给节点添加属性
+     * @param{Element} ele
+     * @param{VMap} attributeMap
+     */
+    static addAttributeToEle(ele, attributeMap) {
+        var keys = attributeMap.keys();
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = attributeMap.get(key);
+            ele.setAttribute(key, value);
+        }
+    }
+
+    /**
+     * 给节点结构的字符串添加属性
+     * @param html
+     * @param attributeMap
+     * @return {HTMLCollection|*}
+     */
+    static addAttributeToHtml(html, attributeMap) {
+        var eleList = View.parseEle(html);
+        if (eleList.length != 1) {
+            console.warn(html + "\n 包含" + eleList.length + "个节点,无法添加attribute");
+            return html;
+        }
+
+        var ele = eleList[0];
+        ViewManager.addAttributeToEle(ele, attributeMap);
+
+        return View.eleToStr(ele);
+    }
 }
 
+var customViewBuilder = {}
 
+export class ViewBuilder {
+    constructor() {
+        this.viewType = "";//写在ele的tagName或ele的属性view-type的值
+    }
+
+    /**
+     * 根据相关信息创建扩展控件
+     * @param ele 空间对应的节点
+     * @param viewManager
+     * @param listenerLocation 控件监听所在的组件
+     * @return {View}
+     */
+    buildView(ele, viewManager, listenerLocation) {
+        return null;
+    }
+
+    /**
+     * 转化自定义view的id、view-type
+     */
+    static buildHtml(html) {
+        html = idToViewId(html);
+        Object.keys(customViewBuilder).forEach(function (key) {
+            var viewBuilder = customViewBuilder[key];
+            html = tagToViewTypeBy(html, viewBuilder.viewType, [viewBuilder.viewType])
+        })
+        return html;
+    }
+}
+
+/**
+ * 将tagName解析为view-type
+ * @param html
+ * @param viewTypeName
+ * @param tagNames
+ * @return {*}
+ */
+var tagToViewTypeBy = function (html, viewTypeName, tagNames) {
+    tagNames.forEach(tagName => {
+        //简单的穷举tagName的三种情况
+        var regExp_0 = new RegExp("<" + tagName + " ", "gmi");
+        html = html.replace(regExp_0, '<div view-type="' + viewTypeName + '" ');
+
+        var regExp_1 = new RegExp("<" + tagName + "/", "gmi");
+        html = html.replace(regExp_1, '<div view-type="' + viewTypeName + '"/');
+
+        var regExp_2 = new RegExp("<" + tagName + ">", "gmi");
+        html = html.replace(regExp_2, '<div view-type="' + viewTypeName + '">');
+
+        html = html.replace(new RegExp("</" + tagName + ">", "gmi"), "</div>");
+    })
+    return html;
+}
+
+/**
+ * 将id解析为view-id
+ * @param html
+ * @return {*}
+ */
+var idToViewId = function (html) {
+    //简单的穷举id的三种情况
+    var regExp = new RegExp(" id=", "gmi");
+    html = html.replace(regExp, " view-id=");
+
+    var regExp_1 = new RegExp("\"id=", "gmi");
+    html = html.replace(regExp_1, "\" view-id=");
+
+    var regExp_2 = new RegExp("\'id=", "gmi");
+    html = html.replace(regExp_2, "\' view-id=");
+    return html;
+}

@@ -1,5 +1,6 @@
 import ViewManager from "../view/base/ViewManager";
 import GroupView from "../view/group/GroupView";
+import LogView from "@core/frame/view/single/LogView";
 
 export default class Page extends GroupView {
     constructor() {
@@ -19,6 +20,9 @@ export default class Page extends GroupView {
 
         //页面finish时，设置，上回到的页面上获取
         this.backResultData = null;
+
+        //每个页面自带的打印信息空间，显示在页面上，只有开发模式、打包测试版本会显示,正式包中会默认不显示
+        this.logView = null;
     }
 
     create(param) {
@@ -54,7 +58,7 @@ export default class Page extends GroupView {
     }
 
     stop() {
-        if(this.lifeState != PageLifeState.PAUSE){//不是暂停状态，先暂停
+        if (this.lifeState != PageLifeState.PAUSE) {//不是暂停状态，先暂停
             this.pause();
         }
         this.lifeState = PageLifeState.STOP;//当前生命周期处在Page停止
@@ -62,7 +66,7 @@ export default class Page extends GroupView {
     }
 
     destroy() {
-        if(this.lifeState != PageLifeState.STOP){//不是停止状态，先停止
+        if (this.lifeState != PageLifeState.STOP) {//不是停止状态，先停止
             this.stop();
         }
         this.lifeState = PageLifeState.DESTROY;//当前生命周期处在Page销毁
@@ -90,6 +94,36 @@ export default class Page extends GroupView {
     }
 
     onDestroy() {
+    }
+
+    /**
+     * 打印信息
+     * @param info
+     */
+    i(info) {
+        if (this.logView) {
+            this.logView.i(info);
+        }
+    }
+
+    /**
+     * 打印警告
+     * @param info
+     */
+    w(info) {
+        if (this.logView) {
+            this.logView.w(info);
+        }
+    }
+
+    /**
+     * 打印异常
+     * @param info
+     */
+    e(info) {
+        if (this.logView) {
+            this.logView.e(info);
+        }
     }
 
     /**
@@ -240,6 +274,9 @@ export default class Page extends GroupView {
     set html(html) {
         this.viewManager.clear();
         super.html = html;
+
+        //添加LogView
+        this.logView = new LogView(this.viewManager);
     }
 
     get html() {

@@ -29,6 +29,20 @@ export default class ScrollView extends View {
         this.animation = State.ScrollAnimation;
         //生成滚动器
         this.scroller = new Scroller(this);
+
+        /**
+         * @type{string|object}
+         * @private
+         */
+        this._scrollLocate = ScrollNormal;
+
+        this.props.concat({
+            "view-animation": "",
+            "view-scrollStart": "",
+            "view-scrolling": "",
+            "view-scrollEnd": "",
+            "view-locate": "",
+        })
     }
 
     set html(html) {
@@ -145,7 +159,6 @@ export default class ScrollView extends View {
     get imageList() {
         return this._imageList;
     }
-
 
 
     /**
@@ -372,35 +385,6 @@ export default class ScrollView extends View {
         this.scroller.measure();
     }
 
-    /**
-     * 滚动开始监听
-     * @param scrollView
-     * @param x
-     * @param y
-     */
-    onScrollStartListener(scrollView, x, y) {
-
-    };
-
-    /**
-     * 滚动中监听
-     * @param scrollView
-     * @param x
-     * @param y
-     */
-    onScrollingListener(scrollView, x, y) {
-
-    };
-
-    /**
-     * 滚动结束监听
-     * @param scrollView
-     * @param x
-     * @param y
-     */onScrollEndListener(scrollView, x, y) {
-
-    };
-
     callScrollStartListener(scrollView, x, y) {
         var onScrollStartListener = null;
         if (this.onScrollStartListener) {
@@ -501,6 +485,14 @@ export default class ScrollView extends View {
         this.measure();
     }
 
+    set scrollLocate(value) {
+        this._scrollLocate = value;
+    }
+
+    get scrollLocate() {
+        return this._scrollLocate;
+    }
+
     get scrollSpeed() {
         return this.scroller.speed;
     }
@@ -554,19 +546,40 @@ export default class ScrollView extends View {
     }
 
     setAttributeParam() {
-        var animation = View.parseAttribute("view-animation",this.ele);
-        if(animation == "false" && animation == "0" ){
+        super.setAttributeParam();
+        var animation = this.props["view-animation"];//是否有滚动动画
+        if (animation == "false" || animation == "0") {
             this.animation = false;
         }
 
-        var scrollStart = View.parseAttribute("view-scrollStart", this.ele);//开始滚动
-        var scrolling = View.parseAttribute("view-scrolling", this.ele);//开始滚动
-        var scrollEnd = View.parseAttribute("view-scrollEnd", this.ele);//开始滚动
-        this.onScrollStartListener = scrollStart;
-        this.onScrollingListener = scrolling;
-        this.onScrollEndListener = scrollEnd;
+        var scrollLocate = this.props["view-locate"];
+        if (scrollLocate == "start") {
+            this.scrollLocate = ScrollStart;
+        } else if (scrollLocate == "center") {
+            this.scrollLocate = ScrollCenter;
+        } else if (scrollLocate == "end") {
+            this.scrollLocate = ScrollEnd;
+        } else {
+            if (scrollLocate) {
+                console.warn("view-locate值 错误")
+            }
+        }
 
-        return super.setAttributeParam();
+        var scrollStart = this.props["view-scrollStart"];//开始滚动
+        var scrolling = this.props["view-scrolling"];//开始滚动
+        var scrollEnd = this.props["view-scrollEnd"];//开始滚动
+        if (scrollStart) {
+            this.onScrollStartListener = scrollStart;
+        }
+        if (scrolling) {
+            this.onScrollingListener = scrolling;
+        }
+        if (scrollEnd) {
+            this.onScrollEndListener = scrollEnd;
+        }
+
+
+        return false;
     }
 
     /**
@@ -579,8 +592,8 @@ export default class ScrollView extends View {
     static parseByEle(ele, viewManager, listenerLocation) {
         var scrollView = new ScrollView(viewManager, listenerLocation);
         scrollView.ele = ele;
-        scrollView.setAttributeParam(ele);
         scrollView.bindImage();
+        scrollView.bindText();
         scrollView.scroller.init();
         viewManager.eleToObject(scrollView.scroller.ele, scrollView, listenerLocation);//往内部执行
         return scrollView;
@@ -654,9 +667,9 @@ export class Scroller extends View {
     }
 
     verticalTo(y) {
-        this.fatherView.callScrollStartListener(this.fatherView, this.scrollLeft, this.scrollTop);
+        this.fatherView.callScrollStartListener(this.fatherView, 0 - this.left, 0 - this.top);
         this.top = y;
-        this.fatherView.callScrollEndListener(this.fatherView, this.scrollLeft, this.scrollTop);
+        this.fatherView.callScrollEndListener(this.fatherView, 0 - this.left, 0 - this.top);
     }
 
     smoothVerticalTo(y) {
@@ -672,9 +685,9 @@ export class Scroller extends View {
         }
 
         var speed = this.speed;
-        if (Math.abs(this.top - y) > 20 * this.speed) {
-            speed = Math.abs(this.top - y) / 20 + 1;
-            speed = parseInt(speed);
+        if (Math.abs(this.top - y) > 15 * this.speed) {
+            speed = Math.abs(this.top - y) / 15 + 1;
+            speed = Math.ceil(speed);
         }
 
         //使用较大的滚动速度
@@ -682,14 +695,13 @@ export class Scroller extends View {
             this.currentSpeedV = speed;
         }
         // console.log("纵向滚动速度：" + this.currentSpeedV);
-
         startScrollVerticalTo(this, y, this.currentSpeedV);
     }
 
     horizontalTo(x) {
-        this.fatherView.callScrollStartListener(this.fatherView, this.scrollLeft, this.scrollTop);
+        this.fatherView.callScrollStartListener(this.fatherView, 0 - this.left, 0 - this.top);
         this.left = x;
-        this.fatherView.callScrollEndListener(this.fatherView, this.scrollLeft, this.scrollTop);
+        this.fatherView.callScrollEndListener(this.fatherView, 0 - this.left, 0 - this.top);
     }
 
     smoothHorizontalTo(x) {
@@ -701,13 +713,13 @@ export class Scroller extends View {
             clearTimeout(this.hTimer);
         }
         if (!this.isScrolling) {
-            this.fatherView.callScrollStartListener(this.fatherView, this.left, this.top);
+            this.fatherView.callScrollStartListener(this.fatherView, 0 - this.left, 0 - this.top);
         }
 
         var speed = this.speed;
-        if (Math.abs(this.left - x) > 20 * this.speed) {
-            speed = Math.abs(this.left - x) / 20 + 1;
-            speed = parseInt(speed);
+        if (Math.abs(this.left - x) > 15 * this.speed) {
+            speed = Math.abs(this.left - x) / 15 + 1;
+            speed = Math.ceil(speed);
         }
 
         //使用较大的滚动速度
@@ -715,7 +727,6 @@ export class Scroller extends View {
             this.currentSpeedH = speed;
         }
         // console.log("横向滚动速度：" + this.currentSpeedH);
-
         startScrollHorizontalTo(this, x, this.currentSpeedH);
     }
 
@@ -724,8 +735,7 @@ export class Scroller extends View {
     }
 
     set left(value) {
-        this.position.left = value;
-        this.setStyle("left", value + "px");
+        super.left = value;
     }
 
     get top() {
@@ -733,8 +743,11 @@ export class Scroller extends View {
     }
 
     set top(value) {
-        this.position.top = value;
-        this.setStyle("top", value + "px");
+        super.top = value;
+    }
+
+    setAttributeParam() {
+        return false;
     }
 }
 
@@ -772,6 +785,46 @@ var startScrollVerticalTo = function (scroller, y, speed) {
 };
 
 /**
+ * 有兼容问题
+ */
+var scrollVerticalTo = function (scroller, y, speed) {
+    var top = scroller.top;
+    var distance = top - y;
+
+    scroller.setStyle("transform", "translateY(" + (0 - distance) + "px)");
+    scroller.setStyle("webkitTransform", "translateY(" + (0 - distance) + "px)");
+    var time = Math.abs(distance) / speed * scroller.cell;
+    scroller.setStyle("transition", "transform " + (time / 1000) + "s ease")
+    scroller.setStyle("webkitTransition", "-webkit-transform " + (time / 1000) + "s ease")
+
+    var index = 0;
+    scroller.vTimer = setInterval(function () {
+        index++;
+        var scrollTop = 0;
+        if (y > top) {
+            scrollTop = top + speed * index;
+        } else {
+            scrollTop = top - speed * index;
+        }
+        //滚动中的scrollLeft有误差，css的平移不是线性的，但这里是用线性计算的
+        scroller.fatherView.callScrollingListener(scroller.fatherView, 0 - scroller.left, 0 - scrollTop);
+    }, scroller.cell);
+
+    scroller.ele.addEventListener('transitionend', function (event) {
+        clearInterval(scroller.vTimer)
+
+        // 在这里执行过渡结束后的操作
+        scroller.top = y;
+        scroller.setStyle("transition", "unset")
+        scroller.setStyle("webkitTransition", "unset")
+        scroller.setStyle("transform", "translateY(0px)")
+        scroller.setStyle("webkitTransform", "translateY(0px)")
+
+        scroller.fatherView.callScrollEndListener(scroller.fatherView, 0 - scroller.left, 0 - scroller.top);
+    })
+}
+
+/**
  * 纵向滚动的工具，不对外
  * @param scroller
  * @param y
@@ -795,7 +848,7 @@ var startScrollHorizontalTo = function (scroller, x, speed) {
     scroller.left = left;
 
     scroller.isScrolling = true;
-    scroller.fatherView.callScrollingListener(scroller.fatherView, 0 - x, 0 - scroller.top);
+    scroller.fatherView.callScrollingListener(scroller.fatherView, 0 - left, 0 - scroller.top);
 
     scroller.hTimer = setTimeout(function () {
         if (scroller && scroller.ele) {
@@ -803,3 +856,44 @@ var startScrollHorizontalTo = function (scroller, x, speed) {
         }
     }, scroller.cell);
 };
+
+/**
+ * 有兼容问题
+ */
+var scrollHorizontalTo = function (scroller, x, speed) {
+    var left = scroller.left;
+    var distance = left - x;
+
+    scroller.setStyle("transform", "translateX(" + (0 - distance) + "px)");
+    scroller.setStyle("webkitTransform", "translateX(" + (0 - distance) + "px)");
+    var time = Math.abs(distance) / speed * scroller.cell;
+    scroller.setStyle("transition", "transform " + (time / 1000) + "s ease")
+    scroller.setStyle("webkitTransition", "-webkit-transform " + (time / 1000) + "s ease")
+
+    var index = 0;
+    scroller.hTimer = setInterval(function () {
+        index++;
+        var scrollLeft = 0;
+        if (x > left) {
+            scrollLeft = left + speed * index;
+        } else {
+            scrollLeft = left - speed * index;
+        }
+        //滚动中的scrollLeft有误差，css的平移不是线性的，但这里是用线性计算的
+        scroller.fatherView.callScrollingListener(scroller.fatherView, 0 - scrollLeft, 0 - scroller.top);
+    }, scroller.cell);
+
+
+    scroller.ele.addEventListener('transitionend', function (event) {
+        clearInterval(scroller.hTimer)
+
+        // 在这里执行过渡结束后的操作
+        scroller.left = x;
+        scroller.setStyle("transition", "unset")
+        scroller.setStyle("webkitTransition", "unset")
+        scroller.setStyle("transform", "translateX(0px)")
+        scroller.setStyle("webkitTransform", "translateX(0px)")
+
+        scroller.fatherView.callScrollEndListener(scroller.fatherView, 0 - scroller.left, 0 - scroller.top);
+    })
+}

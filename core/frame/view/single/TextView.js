@@ -22,12 +22,13 @@ export default class TextView extends View {
 
         //原文字的span
         this.span = null;
-        //复制文字的span
         this.copySpan = null;
-
     }
 
     marquee() {
+        if (this.isMarquee) {
+            return;
+        }
         this.judgeMarquee();//判断是否需要跑马灯
         if (!this.canMarquee) {//不需要
             return;
@@ -158,12 +159,13 @@ export default class TextView extends View {
      * 将标签中的属性解析到对应的变量中
      */
     setAttributeParam() {
+        super.setAttributeParam()
         var text = this.ele.innerHTML;//  类似"\n"这样的符号也会被获取并生效
         this.setStyle("lineHeight", this.height + "px");//自动加上lineHeight
         this.setStyle("overflow", "hidden");//自动加上超出隐藏
         this.text = text;
 
-        return super.setAttributeParam();
+        return false;
     }
 
     /**
@@ -176,7 +178,6 @@ export default class TextView extends View {
     static parseByEle(ele, viewManager, listenerLocation) {
         var textView = new TextView(viewManager, listenerLocation);
         textView.ele = ele;
-        textView.setAttributeParam();
         return textView;
     }
 
@@ -242,6 +243,14 @@ class TextScroller extends View {
         }
     }
 
+    get ele() {
+        return this._ele;
+    }
+
+    set ele(value) {
+        this._ele = value;
+    }
+
     /**
      * 测量宽、高
      */
@@ -290,7 +299,7 @@ var startHorizontalScroll = function (scroller, x, speed) {
     }
     var left = scroller.left;
 
-    if (left + x == 0) {
+    if (left + x <= 0) {
         left = -1;
     } else {
         left -= speed;

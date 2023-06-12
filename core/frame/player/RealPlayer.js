@@ -1,8 +1,6 @@
 /**
  * 对接播放器时，需要继承这个类，并重写所有方法
  */
-import PlayInfo from "@core/frame/player/PlayInfo";
-
 export default class RealPlayer{
     constructor() {
         this.playInfo = null;

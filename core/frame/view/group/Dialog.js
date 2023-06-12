@@ -43,6 +43,7 @@ export default class Dialog extends GroupView {
 
     set ele(value) {
         super.ele = value;
+        this.setStyle("zIndex", "100");
         this.setStyle("visibility", "");
         this.setStyle("display", "none");
     }
@@ -68,22 +69,10 @@ export default class Dialog extends GroupView {
     static parseByEle(ele, viewManager, listenerLocation) {
         var dialog = new Dialog(viewManager, listenerLocation);
         dialog.ele = ele;
-        dialog.setAttributeParam(ele);
         dialog.scroller.init();
         dialog.bindImage();
+        dialog.bindText();
         viewManager.eleToObject(dialog.scroller.ele, dialog, listenerLocation);//往内部执行
         return dialog;
     }
-}
-
-/**
- * 创建dialog的ele
- * TODO 未确认效果，需要调试下
- */
-var buildEle = function (dialog) {
-    var ele = document.createElement("div");
-    dialog.ele = ele;
-    dialog.width = dialog.page.width;
-    dialog.height = dialog.path.height;
-    dialog.hide();
 }
